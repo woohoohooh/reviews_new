@@ -1,0 +1,38 @@
+# Игнорируем файлы и каталоги, специфичные для Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Файлы, связанные с виртуальными окружениями
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Файлы и папки, специфичные для IDE
+.idea/
+.vscode/
+001.iml
+misc.xml
+modules.xml
+profiles_settings.xml
+vcs.xml
+workspace.xml
+
+# Каталоги с файлами, которые не нужно коммитить
+build/
+dist/
+
+# Логи и кэшированные файлы
+*.log
+*.local
+*.cache
+*.tmp
+
+# Другие файлы и каталоги, которые обычно не коммитятся
+*.egg-info/
+.DS_Store
+Thumbs.db

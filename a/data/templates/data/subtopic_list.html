@@ -1,0 +1,19 @@
+{% extends 'data/base.html' %}
+
+{% block title %}{{ subtopic.title }}{% endblock %}
+
+{% block description %}{{ subtopic.seo_description }}{% endblock %}
+
+{% block keywords %}{{ subtopic.keywords }}{% endblock %}
+
+{% block content %}
+<h1>{{ subtopic.title }}</h1>
+
+<ul class="list-group">
+    {% for step in steps %}
+        <li class="list-group-item">
+            <a href="{% url 'step_detail' step.slug %}">{{ step.title }}</a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

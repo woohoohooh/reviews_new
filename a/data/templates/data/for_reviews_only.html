@@ -1,0 +1,52 @@
+<div class="container">
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            <textarea name="text" rows="20" cols="80" placeholder="Вставьте текст здесь..."></textarea>
+            <br>
+            <button type="submit">Создать шаг</button>
+        </form>
+    </div>
+
+    <div class="results-container">
+        {% if step %}
+            <h1 class="success-title">Шаг успешно создан!</h1>
+            <div class="step-details">
+                <p><strong>Ответ от автора сайта:</strong> {{ step.description }}</p>
+                <p><strong>Мини-фраза:</strong> {{ step.slug }}</p>
+                <p><strong>Ключевая фраза:</strong> {{ step.keyword }}</p>
+                <p><strong>Заголовок title:</strong> {{ step.title }}</p>
+                <p><strong>Заголовок h1:</strong> {{ step.h1 }}</p>
+                <p><strong>Название картинки для файла:</strong> {{ step.image_file_name }}</p>
+                <p><strong>Описание картинки:</strong> {{ step.image_alt_and_prompt }}</p>
+                <p><strong>Тип автора:</strong> {{ step.author_type }}</p>
+                <p><strong>Категория:</strong> {{ step.subtopic }}</p>
+                <p><strong>Теги:</strong>
+                    {% if step.tags.exists %}
+                        {% for tag in step.tags.all %}
+                            {{ tag }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        Нет тегов
+                    {% endif %}
+                </p>
+                <p><strong>Дискрипшн:</strong> {{ step.seo_description }}</p>
+                <p><strong>Сайт:</strong> {{ step.site }}</p>
+            </div>
+        {% endif %}
+
+        {% if errors %}
+<div class="error-messages">
+    <ul>
+        {% for field, error_list in errors.items %}
+            <li>
+                <strong>{{ field|default:"Общая ошибка" }}:</strong>
+                {{ error_list|join:", " }}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+    </div>
+</div>
