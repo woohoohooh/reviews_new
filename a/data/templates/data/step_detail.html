@@ -1,115 +1,121 @@
-{# Доработка base.html: В футере по центру добавить ссылку на VK #}
-<footer class="text-center">
-    <a href="https://vk.com/otzyvyv" target="_blank">VK Отзывы в РФ</a>
-</footer>
+{% extends "data/base.html" %}
 
-{% extends 'data/base.html' %}
+{% block title %}{{ step.title }}{% endblock %}
 
-{% block title %}Отзывы в РФ: Реальные мнения о товарах, услугах и компаниях для вашего выбора{% endblock %}
+{% block description %}{{ step.seo_description }}{% endblock %}
 
-{% block description %}Платформа «Отзывы в РФ» — место для честных отзывов о товарах, услугах и компаниях. Читайте объективные мнения, оставляйте свои и принимайте взвешенные решения!{% endblock %}
+{% block keywords %}{{ step.keywords }}{% endblock %}
 
-{% block keywords %}отзывы, честные отзывы, отзывы о товарах, отзывы о компаниях, отзывы о услугах, рейтинг компаний, реальные мнения{% endblock %}
+{% load blog_extras %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+    {{ schema_data|safe|json_script:"application/ld+json" }}
+</script>
+<script type="application/ld+json">
+    {{ schema_breadcrumbs|safe|json_script:"application/ld+json" }}
+</script>
+{% endblock %}
 
 {% block content %}
 
-    <section class="container my-5">
-        <h1>Читайте и оставляйте честные отзывы о товарах, услугах и компаниях</h1>
+<style>
+    .comments-section {
+        margin-top: 40px;
+    }
+    .comments-section ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .comment-item {
+        margin-bottom: 20px;
+        padding: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 5px;
+        background-color: #fcfcfc;
+    }
+    .comment-item strong {
+        font-size: 1.1em;
+        color: #333;
+    }
+    .comment-item p {
+        margin: 10px 0 0;
+        line-height: 1.5;
+    }
+    .comment-form textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        resize: vertical;
+    }
+    .comment-form button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .comment-form button:hover {
+        background-color: #0056b3;
+    }
+</style>
 
-        <p>
-            Добро пожаловать на <strong>«Отзывы в РФ»</strong> — вашу надежную платформу для обмена реальным опытом! Здесь собраны тысячи честных мнений о компаниях, продуктах и сервисах от обычных пользователей, как вы. Мы помогаем принимать обоснованные решения, избегая разочарований и открывая лучшие варианты.
-        </p>
+<h1>{{ step.h1 }}</h1>
+<p><p>{{ step.formatted_updated_date }}</p></p><br><br>
+{% if step.image %}
+    <img src="{{ step.image.url }}" alt="{{ step.image_alt }}" style="border-radius: 3px; max-width: 100%; height: auto;">
+{% endif %}
+<p>{{ step.description|convert_markdown|safe }}</p>
 
-        <h2>🔹 Почему миллионы выбирают «Отзывы в РФ»?</h2>
-        <ul>
-            <li><strong>Гарантия честности.</strong> Каждый отзыв проходит строгую модерацию на подлинность.</li>
-            <li><strong>Полная объективность.</strong> Нет места рекламе или заказным текстам — только настоящие истории.</li>
-            <li><strong>Смарт-рейтинг.</strong> Лайки, комментарии и оценки выделяют самые полезные отзывы для вас.</li>
-            <li><strong>Удобный поиск.</strong> Быстрая навигация по категориям, фильтрам и ключевым словам.</li>
-        </ul>
+<div class="comments-section">
+    {% if comments %}
+        <ul id="comments-list">
+            {% for comment in comments %}
+                <li class="comment-item"
+                    style="border-left: 5px solid {% if comment.is_positive %}#007BFF{% else %}red{% endif %};
+                           padding-left: 10px;
+                           margin-bottom: 10px;">
 
-        <h2>🔹 Свежие отзывы от пользователей:</h2>
-        <ul class="list-group">
-            {% for step in steps %}
-                <li class="list-group-item">
-                    <a href="{% url 'step_detail' slug=step.slug %}">{{ step.title }}</a>
-                    <br>
-                    <small>Опубликовано: {{ step.published_date|date:"d.m.Y" }}</small>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong>{{ comment.username|default:"Аноним" }}</strong>
+                        {% if comment.created_date %}
+                            <span style="font-size: 0.9em; color: #888;">{{ comment.formatted_created_date }}</span>
+                        {% endif %}
+                    </div>
+
+                    <p>{{ comment.text|linebreaks }}</p>
+
+                    <span style="font-size: 0.9em; font-weight: bold; color: {% if comment.is_positive %}#007BFF{% else %}red{% endif %};">
+                        {% if comment.is_positive %}Позитивный{% else %}Негативный{% endif %}
+                    </span>
+
                 </li>
-            {% empty %}
-                <li class="list-group-item">Отзывов пока нет. Будьте первым!</li>
             {% endfor %}
         </ul>
+    {% else %}
+        <p id="no-comments">Комментариев пока нет.</p>
+    {% endif %}
+</div>
 
-        <!-- Пагинация -->
-        <nav>
-            <ul class="pagination justify-content-center mt-4">
-                {% if steps.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1">Первая</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ steps.previous_page_number }}">Назад</a>
-                    </li>
-                {% endif %}
 
-                <li class="page-item disabled">
-                    <span class="page-link">Страница {{ steps.number }} из {{ steps.paginator.num_pages }}</span>
-                </li>
+    <form method="post" class="comment-form">
+    {% csrf_token %}
+    <div style="display: none;">
+        <label for="honey_pot">Оставьте это поле пустым</label>
+        <input type="text" name="honey_pot" id="honey_pot">
+    </div>
+    {% if not user.is_authenticated %}
+    <div>
+        <input type="text" name="user_name" id="user_name" placeholder="Ваше имя" required>
+    </div>
+    {% endif %}
+    <textarea name="content" rows="3" placeholder="Оставьте комментарий..." required></textarea>
+    <button type="submit">Отправить</button>
+    </form>
 
-                {% if steps.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ steps.next_page_number }}">Вперёд</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ steps.paginator.num_pages }}">Последняя</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-
-        <h2>🔹 Часто задаваемые вопросы (FAQ)</h2>
-        <div class="faq-block">
-            <h3>📌 Что представляет собой «Отзывы в РФ»?</h3>
-            <p>
-                Это независимая площадка для обмена отзывами о товарах, услугах и компаниях. Мы объединяем пользователей, чтобы делиться опытом и помогать друг другу в выборе — от повседневных покупок до важных решений.
-            </p>
-
-            <h3>📌 Как быстро найти подходящий отзыв?</h3>
-            <p>
-                Используйте поисковую строку или перейдите в нужную категорию. Фильтры по рейтингу, дате и популярности сделают поиск еще проще и эффективнее.
-            </p>
-
-            <h3>📌 Насколько можно доверять отзывам?</h3>
-            <p>
-                Мы тщательно модерируем каждый отзыв, удаляя фейки, спам и рекламу. Только зарегистрированные пользователи могут оставлять мнения, обеспечивая высокий уровень достоверности.
-            </p>
-
-            <h3>📌 Как опубликовать свой отзыв?</h3>
-            <p>
-                Зарегистрируйтесь, выберите категорию и заполните простую форму. Поделитесь честным опытом — это не только поможет другим, но и повысит вашу репутацию на платформе.
-            </p>
-
-            <h3>📌 Можно ли обсуждать отзывы?</h3>
-            <p>
-                Конечно! Комментируйте, задавайте вопросы и вступайте в дискуссии. Это делает сообщество живым и помогает уточнить детали.
-            </p>
-        </div>
-
-        <h2>🔹 Как оставить отзыв и стать частью сообщества?</h2>
-        <p>
-            Поделитесь своим опытом легко и быстро — следуйте этим шагам:
-        </p>
-        <ol>
-            <li><strong>Зарегистрируйтесь за секунды.</strong> Быстро и без лишних данных.</li>
-            <li><strong>Найдите категорию.</strong> Выберите товар, услугу или компанию из удобного каталога.</li>
-            <li><strong>Расскажите свою историю.</strong> Будьте искренни: опишите плюсы, минусы и детали.</li>
-            <li><strong>Добавьте фото или доказательства.</strong> Сделайте отзыв визуальным и убедительным.</li>
-            <li><strong>Опубликуйте и вдохновите других.</strong> После модерации ваш отзыв поможет тысячам пользователей!</li>
-        </ol>
-
-        <p>💡 <strong>Ваши отзывы — ключ к лучшим выборам для всех. Присоединяйтесь и влияйте на рынок!</strong></p>
-
-    </section>
-
+</div>
 {% endblock %}
