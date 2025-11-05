@@ -93,11 +93,22 @@ AWS_S3_REGION_NAME = 'ru-1'
 AWS_S3_ENDPOINT_URL = 'https://s3.timeweb.cloud'
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.timeweb.cloud'
 
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_LOCATION_STATIC = 'reviews001_static'
+AWS_LOCATION_MEDIA = 'reviews001_media'
 
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{SUFFIX}_static/'
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{SUFFIX}_media/'
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {"location": AWS_LOCATION_MEDIA},
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {"location": AWS_LOCATION_STATIC},
+    },
+}
+
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION_STATIC}/'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION_MEDIA}/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
