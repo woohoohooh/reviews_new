@@ -3585,6 +3585,8 @@ class Step101(models.Model):
     description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
     title = models.CharField(max_length=150, verbose_name="Заголовок title")
     h1 = models.CharField(max_length=150, verbose_name="Заголовок h1")
+    subtitle = models.CharField(max_length=150, verbose_name="Подзаголовок")
+    brands = models.CharField(max_length=150, verbose_name="Бренды")
     keyword = models.CharField(max_length=150, blank=True, null=True, unique=True, verbose_name="Ключевая фраза")
     keywords = models.CharField(max_length=250, blank=True, null=True, verbose_name="Ключевые фразы")
     image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
@@ -3598,6 +3600,8 @@ class Step101(models.Model):
     is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликовано")
     published_date = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name="Дата публикации")
     updated_date = models.DateTimeField(auto_now=True, db_index=True, verbose_name="Дата обновления")
+
+
     class Meta:
         indexes = [
             models.Index(fields=['is_published', 'published_date']),
@@ -3646,9 +3650,9 @@ class Comment101(models.Model):
     step = models.ForeignKey('Step101', on_delete=models.CASCADE, related_name='comments101', db_index=True, verbose_name="Шаг")
     username = models.CharField(max_length=100, default="Аноним", verbose_name="Имя пользователя")
     text = models.TextField(verbose_name="Текст комментария")
-    is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликован")
     is_positive = models.BooleanField(default=False, db_index=True, verbose_name="Позитивный комментарий")
     created_date = models.DateTimeField(default=now, verbose_name="Дата создания")
+    is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликован")
     published_date = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name="Дата одобрения")
     def save(self, *args, **kwargs):
         if self.is_published and not self.published_date:
@@ -3675,6 +3679,7 @@ class Comment101(models.Model):
 
 
 
+
 def custom_slugify2(value):
     value = re.sub(r'[^\w\s\-]', '', value)
     value = re.sub(r'\s+', '-', value)
@@ -3693,7 +3698,7 @@ class ZRubrics001(models.Model):
         return str(self.name_original)
 
 class ZCompany001(models.Model):
-    rubrics = models.ManyToManyField(ZRubrics001, blank=True)
+    rubrics = models.ManyToManyField('ZRubrics001', blank=True)
     org_name1 = models.CharField('Название 1', max_length=1000, null=True, blank=True, default='')
     org_name2 = models.CharField('Название 2', max_length=1000, blank=True, default='')
     org_name3 = models.CharField('Название 3', max_length=1000, blank=True, default='')
@@ -3712,25 +3717,53 @@ class ZCompany001(models.Model):
     pro = models.BooleanField('PRO', null=True, default=False)
     slug = models.SlugField(unique=True, allow_unicode=True, max_length=1000)
     logo = models.ImageField(upload_to='logos/', blank=True, null=True)
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = custom_slugify2(self.org_name1)
         super().save(*args, **kwargs)
+
     def __str__(self):
         return str(self.org_name1)
+
+    # 👇 Новые удобные методы:
+    def comments_published(self):
+        """Вернуть только опубликованные комментарии"""
+        return self.zcomments001.filter(published=True)
+
+    def comments_count(self):
+        """Сколько комментариев всего"""
+        return self.zcomments001.count()
+
+    def positive_count(self):
+        """Сколько положительных"""
+        return self.zcomments001.filter(is_positive=True).count()
+
+    def negative_count(self):
+        """Сколько отрицательных"""
+        return self.zcomments001.filter(is_positive=False).count()
 
 class ZCompanyRubrics001(models.Model):
     company = models.ForeignKey(ZCompany001, on_delete=models.CASCADE)
     rubric = models.ForeignKey(ZRubrics001, on_delete=models.CASCADE)
+
+from django.utils import timezone
 
 class ZComment001(models.Model):
     company = models.ForeignKey('ZCompany001', on_delete=models.CASCADE, related_name='zcomments001')
     name = models.CharField(max_length=300, default='Anonymous')
     content = models.TextField()
     is_positive = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    published = models.BooleanField('Is published', default=False)
+    created_at = models.DateTimeField(null=True, blank=True)
+
     def __str__(self):
-        return f"{self.company}"
+        return f"{self.name} → {self.company.org_name1}"
+
+    def save(self, *args, **kwargs):
+        if self.published and self.created_at is None:
+            self.created_at = timezone.now()
+        super().save(*args, **kwargs)
 
 class ZFileTracker001(models.Model):
     filename = models.CharField(max_length=255)
