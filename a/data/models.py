@@ -3617,25 +3617,37 @@ class Step101(models.Model):
     @property
     def formatted_updated_date(self):
         return self.updated_date.strftime('%d.%m.%Y')
+
     def clean(self):
-        if len(self.slug) > 150:
+        # slug
+        if self.slug and len(self.slug) > 150:
             raise ValidationError({'slug': "Поле 'slug' слишком длинное. Максимум 150 символов."})
-        if len(self.seo_description) > 350:
+
+        # seo_description
+        if self.seo_description and len(self.seo_description) > 350:
             raise ValidationError({'seo_description': "Поле 'seo_description' слишком длинное. Максимум 350 символов."})
-        if len(self.keyword) > 150:
+
+        # keyword
+        if self.keyword and len(self.keyword) > 150:
             raise ValidationError({'keyword': "Поле 'keyword' слишком длинное. Максимум 150 символов."})
-        if self.keyword:
-            if len(self.keyword) > 150:
-                raise ValidationError({'keyword': "Поле 'keyword' слишком длинное. Максимум 150 символов."})
-        if len(self.description) > 11000:
+
+        # description
+        if self.description and len(self.description) > 11000:
             raise ValidationError({'description': "Поле 'description' слишком длинное. Максимум 11000 символов."})
-        if len(self.h1) > 150:
+
+        # h1
+        if self.h1 and len(self.h1) > 150:
             raise ValidationError({'h1': "Поле 'h1' слишком длинное. Максимум 150 символов."})
-        if len(self.image_file_name) > 150:
+
+        # image_file_name
+        if self.image_file_name and len(self.image_file_name) > 150:
             raise ValidationError({'image_file_name': "Поле 'image_file_name' слишком длинное. Максимум 150 символов."})
-        if len(self.image_alt_and_prompt) > 150:
-            raise ValidationError \
-                ({'image_alt_and_prompt': "Поле 'image_alt_and_prompt' слишком длинное. Максимум 150 символов."})
+
+        # image_alt_and_prompt
+        if self.image_alt_and_prompt and len(self.image_alt_and_prompt) > 150:
+            raise ValidationError(
+                {'image_alt_and_prompt': "Поле 'image_alt_and_prompt' слишком длинное. Максимум 150 символов."})
+
     def save(self, *args, **kwargs):
         self.full_clean()
         if self.is_published and not self.published_date:

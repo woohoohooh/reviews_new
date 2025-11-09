@@ -32,6 +32,7 @@ from django.shortcuts import render
 from .abc import SUFFIX
 from django.apps import apps
 from django.core.paginator import Paginator
+from .forms import Step101Form
 
 def create_unique_slug(base_slug, model):
     slug = slugify(base_slug, allow_unicode=True)
@@ -49,6 +50,38 @@ def extract_between(text, start, end):
     if end:
         text = text.split(end, 1)[0]
     return text.strip()
+
+
+
+def add_step101(request):
+    if request.method == 'POST':
+        form = Step101Form(request.POST)
+        if form.is_valid():
+            step = form.save(commit=False)
+
+            # подтема "Отзывы"
+            step.subtopic = Subtopic101.objects.filter(title__icontains="Отзывы").first()
+
+            # автор по умолчанию "Клиент"
+            step.author_type = Author101.objects.filter(type__icontains="Клиент").first()
+
+            # slug = keyword (через дефисы и lowercase)
+            if step.keyword:
+                step.slug = slugify(step.keyword, allow_unicode=True)
+
+            # дискрипшн -> seo_description
+            step.seo_description = form.cleaned_data.get('description', '')
+
+            # сразу опубликовано
+            step.is_published = True
+            step.published_date = now()
+
+            step.save()
+            return redirect(step.get_absolute_url())
+    else:
+        form = Step101Form()
+
+    return render(request, 'data/add_step101.html', {'form': form})
 
 
 def create_step_for_reviews_only(request):

@@ -9,6 +9,7 @@ sitemaps = {
 }
 
 urlpatterns = [
+    path('add/', views.add_step101, name='add_step101'),
     path('for_reviews_only/', views.create_step_for_reviews_only, name='create_step_for_reviews_only'),
     path('', views.index, name='index'),
     path('add-comment/<slug:step_slug>/', views.add_comment, name='add_comment'),

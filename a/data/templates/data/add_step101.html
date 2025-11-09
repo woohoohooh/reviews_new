@@ -1,0 +1,17 @@
+{% extends 'data/base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Добавить отзыв</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="mb-3">{{ form.title.label_tag }}{{ form.title }}</div>
+    <div class="mb-3">{{ form.h1.label_tag }}{{ form.h1 }}</div>
+    <div class="mb-3">{{ form.subtitle.label_tag }}{{ form.subtitle }}</div>
+    <div class="mb-3">{{ form.brands.label_tag }}{{ form.brands }}</div>
+    <div class="mb-3">{{ form.keyword.label_tag }}{{ form.keyword }}</div>
+    <div class="mb-3">{{ form.keywords.label_tag }}{{ form.keywords }}</div>
+    <div class="mb-3">{{ form.description.label_tag }}{{ form.description }}</div>
+    <button type="submit" class="btn btn-primary">Добавить</button>
+  </form>
+</div>
+{% endblock %}
