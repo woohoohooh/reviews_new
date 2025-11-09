@@ -62,6 +62,9 @@ def create_step_for_reviews_only(request):
                                                                        '**Заголовок title:**')).strip()
             title = extract_between(clean_text, '**Заголовок title:**', '**Заголовок h1:**').strip()
             h1 = extract_between(clean_text, '**Заголовок h1:**', '**Ключевая фраза:**').strip()
+            subtitle = extract_between(clean_text, '**Подзаголовок:**', '**Бренды:**').strip()
+            brands = extract_between(clean_text, '**Бренды:**', '**Заголовок title:**').strip()
+
             keyword = extract_between(clean_text, '**Ключевая фраза:**', '**Ключевые фразы keywords:**').strip()
             keywords = extract_between(clean_text, '**Ключевые фразы keywords:**',
                                         '**Название картинки для файла:**').strip()
@@ -187,6 +190,8 @@ def create_step_for_reviews_only(request):
                 keywords=keywords,
                 title=title,
                 h1=h1,
+                subtitle=subtitle,
+                brands=brands,
                 image_file_name=image_file_name,
                 image_alt_and_prompt=image_alt_and_prompt,
                 slug=slug,

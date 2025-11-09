@@ -3605,6 +3605,8 @@ class Step101(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=['is_published', 'published_date']),
+            models.Index(fields=['subtitle']),
+            models.Index(fields=['brands']),
         ]
         verbose_name = STEP_VERBOSE_NAME_101
         verbose_name_plural = STEP_VERBOSE_NAME_101
