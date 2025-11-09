@@ -3757,13 +3757,12 @@ class ZComment001(models.Model):
     published = models.BooleanField('Is published', default=False)
     created_at = models.DateTimeField(null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.name} → {self.company.org_name1}"
-
     def save(self, *args, **kwargs):
-        if self.published and self.created_at is None:
+        # ✅ если только что опубликован — обновляем дату
+        if self.published:
             self.created_at = timezone.now()
         super().save(*args, **kwargs)
+
 
 class ZFileTracker001(models.Model):
     filename = models.CharField(max_length=255)

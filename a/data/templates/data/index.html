@@ -27,7 +27,7 @@
         <ul class="list-group">
             {% for step in steps %}
                 <li class="list-group-item">
-                    <a href="{% url 'step_detail' slug=step.slug %}">{{ step.title }}</a>
+                    <a href="{% url 'step_detail' slug=step.slug %}">{{ step.h1 }}</a>
                     <br>
                     <small>Опубликовано: {{ step.published_date|date:"d.m.Y" }}</small>
                 </li>

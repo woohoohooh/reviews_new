@@ -64,7 +64,15 @@
     }
 </style>
 
-<h1>{{ step.h1 }}</h1>
+<div class="page-header" style="display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px;">
+    <h1 style="margin: 0;">{{ step.h1 }}</h1>
+    {% if step.subtitle %}
+        <span class="subtitle" style="font-size: 1.1rem; color: #777;">— {{ step.subtitle }}</span>
+    {% endif %}
+</div>
+
+
+
 <p><p>{{ step.formatted_updated_date }}</p></p><br><br>
 {% if step.image %}
     <img src="{{ step.image.url }}" alt="{{ step.image_alt }}" style="border-radius: 3px; max-width: 100%; height: auto;">
