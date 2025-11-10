@@ -3580,27 +3580,26 @@ class Tag101(models.Model):
     def __str__(self):
         return self.name
 
-
 class Step101(models.Model):
-    description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
-    title = models.CharField(max_length=150, verbose_name="Заголовок title")
+    title = models.CharField(max_length=150, verbose_name="Заголовок title", blank=True, null=True)
     h1 = models.CharField(max_length=150, verbose_name="Заголовок h1")
     subtitle = models.CharField(max_length=150, verbose_name="Подзаголовок")
     brands = models.CharField(max_length=150, verbose_name="Бренды")
     keyword = models.CharField(max_length=150, blank=True, null=True, unique=True, verbose_name="Ключевая фраза")
+    description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
+    expert_opinion = models.TextField(blank=True, verbose_name="Экспертное мнение", max_length=11000)
     keywords = models.CharField(max_length=250, blank=True, null=True, verbose_name="Ключевые фразы")
-    image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
+    seo_description = models.CharField(max_length=350, blank=True, null=True, verbose_name="Дискрипшн")
     image_file_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Название картинки для файла")
     image_alt_and_prompt = models.CharField(max_length=150, blank=True, null=True, verbose_name="Описание картинки")
-    subtopic = models.ForeignKey(Subtopic101, related_name='steps101', on_delete=models.CASCADE, db_index=True, verbose_name="Подтема")
+    image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
     tags = models.ManyToManyField(Tag101, related_name="steps101", blank=True, verbose_name="теги")
+    subtopic = models.ForeignKey(Subtopic101, related_name='steps101', on_delete=models.CASCADE, db_index=True, verbose_name="Подтема", default=None)
     author_type = models.ForeignKey(Author101, related_name='steps101', on_delete=models.CASCADE, verbose_name="Автор")
-    seo_description = models.CharField(max_length=350, blank=True, null=True, verbose_name="Дискрипшн")
     slug = models.SlugField(unique=True, db_index=True, allow_unicode=True, max_length=150, verbose_name="Слуг")
     is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликовано")
     published_date = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name="Дата публикации")
     updated_date = models.DateTimeField(auto_now=True, db_index=True, verbose_name="Дата обновления")
-
 
     class Meta:
         indexes = [
@@ -3610,54 +3609,44 @@ class Step101(models.Model):
         ]
         verbose_name = STEP_VERBOSE_NAME_101
         verbose_name_plural = STEP_VERBOSE_NAME_101
+
     def __str__(self):
         return self.h1
+
     def get_absolute_url(self):
         return reverse('step_detail', args=[self.slug])
+
     @property
     def formatted_updated_date(self):
         return self.updated_date.strftime('%d.%m.%Y')
 
     def clean(self):
-        # slug
-        if self.slug and len(self.slug) > 150:
-            raise ValidationError({'slug': "Поле 'slug' слишком длинное. Максимум 150 символов."})
-
-        # seo_description
-        if self.seo_description and len(self.seo_description) > 350:
-            raise ValidationError({'seo_description': "Поле 'seo_description' слишком длинное. Максимум 350 символов."})
-
-        # keyword
-        if self.keyword and len(self.keyword) > 150:
-            raise ValidationError({'keyword': "Поле 'keyword' слишком длинное. Максимум 150 символов."})
-
-        # description
+        # title
+        if self.title and len(self.title) > 150:
+            raise ValidationError({'title': "Поле 'title' слишком длинное. Максимум 150 символов."})
+        # Остальные проверки как у тебя, включая description и т.д.
         if self.description and len(self.description) > 11000:
             raise ValidationError({'description': "Поле 'description' слишком длинное. Максимум 11000 символов."})
-
-        # h1
-        if self.h1 and len(self.h1) > 150:
-            raise ValidationError({'h1': "Поле 'h1' слишком длинное. Максимум 150 символов."})
-
-        # image_file_name
-        if self.image_file_name and len(self.image_file_name) > 150:
-            raise ValidationError({'image_file_name': "Поле 'image_file_name' слишком длинное. Максимум 150 символов."})
-
-        # image_alt_and_prompt
-        if self.image_alt_and_prompt and len(self.image_alt_and_prompt) > 150:
-            raise ValidationError(
-                {'image_alt_and_prompt': "Поле 'image_alt_and_prompt' слишком длинное. Максимум 150 символов."})
+        if self.expert_opinion and len(self.expert_opinion) > 11000:
+            raise ValidationError({'expert_opinion': "Поле 'expert_opinion' слишком длинное. Максимум 11000 символов."})
 
     def save(self, *args, **kwargs):
         self.full_clean()
         if self.is_published and not self.published_date:
             self.published_date = now()
         if not self.slug:
-            clean_title = self.title.strip().replace('\r', '').replace('\n', '')
+            base = self.title or self.h1
+            clean_title = base.strip().replace('\r', '').replace('\n', '')
             self.slug = slugify(clean_title, allow_unicode=True)
         if self.image and not self.image_file_name:
             self.image_file_name = os.path.splitext(os.path.basename(self.image.name))[0]
+        # подставляем "Отзывы" по умолчанию, если есть
+        if not self.subtopic_id:
+            default_subtopic = Subtopic101.objects.filter(title__iexact="Отзывы").first()
+            if default_subtopic:
+                self.subtopic = default_subtopic
         super().save(*args, **kwargs)
+
 
 
 class Comment101(models.Model):

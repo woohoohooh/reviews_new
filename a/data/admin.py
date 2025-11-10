@@ -25,18 +25,41 @@ class CommentInline(admin.TabularInline):
     ordering = ('-created_date',)
     show_change_link = True
 
-# Админка для Step с комментариями
 @admin.register(globals()[f'Step{SUFFIX_101}'])
 class StepAdmin(admin.ModelAdmin):
     list_display = ('h1', 'subtitle', 'is_published')
-    actions = ['publish_selected']
     list_per_page = 50
+    actions = ['publish_selected']
     inlines = [CommentInline]
+
+    fieldsets = (
+        (None, {
+            'fields': (
+                'h1',
+                'subtitle',
+                'brands',
+                'keyword',
+                'description',
+                'expert_opinion',
+                'keywords',
+                'seo_description',
+                'image_file_name',
+                'image_alt_and_prompt',
+                'image',
+                'tags',
+                'subtopic',
+                'author_type',
+                'slug',
+                'is_published',
+            )
+        }),
+    )
 
     @admin.action(description="Опубликовать выбранные шаги")
     def publish_selected(self, request, queryset):
         updated_count = queryset.update(is_published=True, published_date=timezone.now())
         self.message_user(request, f"{updated_count} шагов успешно опубликовано.")
+
 
 @admin.register(globals()[f'Comment{SUFFIX_101}'])
 class CommentAdmin(admin.ModelAdmin):
