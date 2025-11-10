@@ -1,0 +1,88 @@
+{% load static %}
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body {
+    font-family: 'Nunito', sans-serif;
+}
+</style>
+<button onclick="location.href='/test2'">← Back</button>
+<select id="num_reviews">
+    <option value="random" {% if selected_num == 'random' %}selected{% endif %}>Random</option>
+    {% for i in "1234567890" %}
+        <option value="{{ forloop.counter }}" {% if selected_num == forloop.counter|stringformat:"s" %}selected{% endif %}>{{ forloop.counter }}</option>
+    {% endfor %}
+</select>
+<button onclick="location.href='?num=' + document.getElementById('num_reviews').value">Select</button><br><br><br>
+<hr><br>
+<form method="post" action="">
+    {% csrf_token %}
+    <div class="form-check"><br>
+        <input type="radio" class="form-check-input" id="positive" name="feedback_type" value="positive" checked>
+        <label class="form-check-label" for="positive">RECOMMEND</label>
+    </div><br>
+    <div class="form-check">
+        <input type="radio" class="form-check-input" id="negative" name="feedback_type" value="negative">
+        <label class="form-check-label" for="negative">NOT RECOMMEND</label>
+    </div><br><br>
+    <div class="form-group">
+        <label for="name">Name&nbsp;&nbsp;&nbsp;</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+    </div><br>
+    <div class="form-group">
+        <label for="content">Review</label>
+        <textarea class="form-control" id="content" name="content" required></textarea>
+    </div><br>
+    <div style="display:none;">
+        <label for="fake_field">Не заполнять</label>
+        <input type="text" id="fake_field" name="fake_field">
+    </div>
+    <br>
+    <button type="submit" class="btn btn-outline-secondary"><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SEND REVIEW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br></button>
+</form><br>
+<hr><br><br>
+<div align="center">
+    <button onclick="copyText()"><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COPY PROMPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br></button>
+</div>
+<script>
+function copyText() {
+    const copyText = document.getElementById("copy-text").innerText;
+    const tempInput = document.createElement("textarea");
+    tempInput.value = copyText;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+}
+</script><br><br>
+<hr><br>
+<div id="copy-text">
+1. На мой сайт каталога компаний нужно сгенерировать {{ num_reviews }} уникальных отзывов по требованиям ниже:<br><br>
+{% for review in reviews_context %}
+(Если тип был "нейтральный" или "позитивный", то напиши тут "🟢 RECOMMEND", если негативный, то "🔴 NOT RECOMMEND". Без лишних слов других и это первое что тут надо, имя и отзыв ниже.)<br>
+(Имя комментатора придуманное реалистичное, то есть, как обычно, в комментах бывает - иногда имя, иногда имя фамилия, иногда ник, и другие варианты, чтобы среди этих {{ num_reviews }} отзывов реалистичные имена/ники были - разнообразные очень варианты - то имя, то ник, то и то и другое в разных вариантах тоже, то имя и фамилия, то сокращения. И варианты генерируй уникальные, а то чета в каждом запросе "Анна К." у тебя почти - тупо совсем, когда на сайте миллиард отзывов постю, в каждом десятом Анна К, не делай так - макс рандомные, но ближе к вариантам РФ. И тут без лишних слов тока это, то есть не надо в начале типа "Имя:")<br>
+(Отзыв клиента {{ forloop.counter }} по требованиям (и сразу отзыв тут без лишних слов типа "Отзыв:")<br>
+- человекоподобный;<br>
+- кол-во символов отзыва не менее: {{ review.words }};<br>
+- тип: {{ review.type }};<br>
+- в стиле: {{ review.style }};<br>
+- в тоне: {{ review.tone }};<br>
+{% if review.speech %}- у комментатора: {{ review.speech }};<br>{% endif %}
+{% if review.oborots %}- также у комментатора: {{ review.oborots }};<br>{% endif %}
+{% if review.realism %}- для реалистичности: {{ review.realism }};<br>{% endif %}
+{% if review.some %}- добавь больше: {{ review.some }};<br>{% endif %}
+{% if review.context %}- дополнительно: {{ review.context }};<br>{% endif %}
+{% if review.add %}- особенность: {{ review.add }};<br>{% endif %}
+{% if review.interaction %}- взаимодействует с другими (когда надо имя/ник указать другого комментатора, то из текущих других отзывов надо брать): {{ review.interaction }};<br>{% endif %}
+- имя бренда: {{ review.company_name_instruction }};<br>
+
+
+<br><br>
+{% endfor %}
+2. В ответ только имена и отзывы без лишних слов.<br><br>
+3. Ответы без canvas, просто в чате.<br><br>
+4. Пиши всё 100% уникально и качественно.<br><br>
+5. Не повторяй в отзывах то, что уже написала (или планируешь) в других, то есть если в одном отзыве уже пишется про атмосферу (в офисе, при посещении и т.п.) или про то что заходил в офис/компанию или про персонал, ассортимент и т.д., то не пиши аналогичные слова (и в целом аналогично) в других.<br><br>
+6. Описание компании/товара/услуги: {{ step.description }}<br>
+</div>
+{% endblock %}

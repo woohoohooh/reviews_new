@@ -1,7 +1,7 @@
 from django.urls import path, re_path
 from django.contrib.sitemaps.views import sitemap
 from .sitemaps import (SubtopicSitemap, StepSitemap)
-from . import views
+from .views import test2, add_step101, create_step_for_reviews_only, index, add_comment, subtopic_list, step_detail, step_detail2
 
 sitemaps = {
     'subtopics': SubtopicSitemap,
@@ -9,11 +9,13 @@ sitemaps = {
 }
 
 urlpatterns = [
-    path('add/', views.add_step101, name='add_step101'),
-    path('for_reviews_only/', views.create_step_for_reviews_only, name='create_step_for_reviews_only'),
-    path('', views.index, name='index'),
-    path('add-comment/<slug:step_slug>/', views.add_comment, name='add_comment'),
-    re_path(rf'^topics/(?P<slug>.+)/$', views.subtopic_list, name='subtopic_list'),
-    re_path(rf'^(?P<slug>.+)/$', views.step_detail, name='step_detail'),
+    path('test2/', test2, name='test2'),
+    re_path(r'^2/(?P<slug>.+)/$', step_detail2, name='step_detail2'),
+    path('add/', add_step101, name='add_step101'),
+    path('for_reviews_only/', create_step_for_reviews_only, name='create_step_for_reviews_only'),
+    path('', index, name='index'),
+    path('add-comment/<slug:step_slug>/', add_comment, name='add_comment'),
+    re_path(rf'^topics/(?P<slug>.+)/$', subtopic_list, name='subtopic_list'),
+    re_path(rf'^(?P<slug>.+)/$', step_detail, name='step_detail'),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
 ]

@@ -3611,7 +3611,7 @@ class Step101(models.Model):
         verbose_name = STEP_VERBOSE_NAME_101
         verbose_name_plural = STEP_VERBOSE_NAME_101
     def __str__(self):
-        return self.title
+        return self.h1
     def get_absolute_url(self):
         return reverse('step_detail', args=[self.slug])
     @property

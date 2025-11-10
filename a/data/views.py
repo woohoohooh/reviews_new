@@ -33,6 +33,20 @@ from .abc import SUFFIX
 from django.apps import apps
 from django.core.paginator import Paginator
 from .forms import Step101Form
+from django.db.models import Q, Count
+from django.contrib import messages
+import os
+import random
+import logging
+import datetime
+import json
+from urllib.parse import unquote
+from django.http import HttpResponse, HttpResponseForbidden
+from django.shortcuts import get_object_or_404, render, redirect
+from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.urls import reverse
+
 
 def create_unique_slug(base_slug, model):
     slug = slugify(base_slug, allow_unicode=True)
@@ -50,6 +64,256 @@ def extract_between(text, start, end):
     if end:
         text = text.split(end, 1)[0]
     return text.strip()
+
+
+
+
+def test2(request):
+
+    steps_list = Step101.objects.filter(is_published=True).order_by('-published_date')
+    paginator = Paginator(steps_list, 30)  # По 30 шагов на страницу
+
+    page_number = request.GET.get('page')
+    steps = paginator.get_page(page_number)
+
+    return render(request, 'data/test2.html', {'steps': steps})
+
+
+
+import random
+
+def maybe(prob, func):
+    if random.random() * 100 < prob:
+        return func()
+    return None
+
+def weighted_choice(choices, num_reviews=None):
+    filtered_choices = choices
+    if num_reviews is not None and num_reviews == 1:
+        filtered_choices = [c for c in choices if len(c) < 3 or not c[2]]
+    if not filtered_choices:
+        return None
+    values = [c[0] for c in filtered_choices]
+    weights = [c[1] for c in filtered_choices]
+    return random.choices(values, weights=weights)[0]
+
+
+def get_brands_list(step):
+    """Преобразует строку брендов в список и возвращает случайный бренд"""
+    if not step.brands:
+        return None
+    brands = [b.strip() for b in step.brands.split(",") if b.strip()]
+    if not brands:
+        return None
+    return random.choice(brands)
+
+
+def generate_reviews_context(step=None, num_reviews=10):
+    """Генерация контекстов отзывов с реалистичными шансами появления блоков."""
+    ranges = [
+        (30, 100),
+        (30, 200),
+        (30, 300),
+        (100, 400),
+        (100, 500),
+        (100, 600),
+        (100, 700),
+        (30, 800),
+        (30, 1000),
+        (30, 2000)
+    ]
+    random.shuffle(ranges)
+    reviews_context = []
+    brand = get_brands_list(step)
+    for i in range(num_reviews):
+        min_len, max_len = ranges[i % len(ranges)]
+        company_name_variants = [
+            ("не указывать", 75),
+            (f"указать в отзыве: {brand} (изменить окончание под контекст, если это уместно, если нет - не менять окончание и указать в точности)"
+             if brand is not None
+             else "указать в отзыве (изменить окончание под контекст, если это уместно, если нет - не менять окончание и указать в точности)",
+             21),
+            (f"указать в отзыве: {brand} (не менять окончание под контекст и указать в точности)"
+             if brand is not None
+             else "указать в отзыве (не менять окончание под контекст и указать в точности)", 1),
+            (f"указать в отзыве: {brand} (если в бренде цифры - расшифровывать/перевести в слова)"
+             if brand is not None
+             else "указать в отзыве (если в бренде цифры - расшифровывать/перевести в слова)", 1),
+            (f"указать в отзыве: {brand} (если бренд из нескольких слов - написать без пробелов, а если из 1 - то пробелы вокруг бренда указываем)"
+             if brand is not None
+             else "указать в отзыве (если бренд из нескольких слов - написать без пробелов, а если из 1 - то пробелы вокруг бренда указываем)", 0.5),
+            (f"указать в отзыве: {brand} (если бренд на рус или англ - сделать транслит в другую сторону)"
+             if brand is not None
+             else "указать в отзыве (если бренд на рус или англ - сделать транслит в другую сторону)", 1),
+            (f"указать в отзыве: {brand} (если бренд на русском - сделать перевод на англ, если на англ - сделать перевод на русский)"
+             if brand is not None
+             else "указать в отзыве (если бренд на русском - сделать перевод на англ, если на англ - сделать перевод на русский)", 0.5),
+        ]
+        realism_variants = [
+            ("иногда пропускает запятые для реалистичности", 20),
+            ("в основном пишет одним предложением", 15),
+            ("добавляет опечатки или ошибки в словах", 10),
+            ("пишет несколько пунктов про ошибки или достоинства", 15),
+            ("делает отзыв коротким без 'но' и переходов", 20),
+            ("смешивает предложения разной длины для естественности", 20),
+        ]
+        data = {
+            "words": random.randint(min_len, max_len),
+            "style": weighted_choice([
+                ("формальный", 35),
+                ("неформальный", 30),
+                ("повествовательный", 20),
+                ("разговорный", 10),
+                ("дружелюбный", 5),
+            ]),
+            "type": weighted_choice([
+                ("позитивный", 30),
+                ("умеренно позитивный", 20),
+                ("нейтральный", 20),
+                ("умеренно негативный", 15),
+                ("негативный", 15),
+            ]),
+            "tone": weighted_choice([
+                ("спокойный", 35),
+                ("эмоциональный", 20),
+                ("уверенный", 15),
+                ("разговорный", 10),
+                ("вежливый", 10),
+                ("ироничный", 10),
+            ]),
+            "speech": weighted_choice([
+                ("разговорная речь с местными словами", 25),
+                ("упрощённые фразы, как у обычного клиента", 25),
+                ("сленг и разговорные выражения", 17),
+                ("грамотная речь без излишеств", 15),
+                ("нейтральный стиль общения", 15),
+                ("с акцентом какой-то страны из СНГ", 3),
+            ]),
+            "oborots": maybe(15, lambda: weighted_choice([
+                ("часто использует эмоции", 10),
+                ("редко использует вводные слова", 20),
+                ("иногда делает акценты", 15),
+                ("использует повторы для усиления", 15),
+                ("упрощает предложения для естественности", 30),
+                ("использует метафоры или сравнения", 5),
+                ("добавляет риторические вопросы", 5),
+            ])),
+            "some": maybe(25, lambda: weighted_choice([
+                ("эмоций", 5),
+                ("деталей", 40),
+                ("примеров", 20),
+                ("личных наблюдений", 10),
+                ("конкретных ситуаций", 15),
+                ("сравнений с другими компаниями", 5),
+                ("ссылок на личный опыт", 5),
+            ])),
+            "context": maybe(15, lambda: weighted_choice([
+                ("комментирует качество услуг", 20),
+                ("отмечает скорость ответа", 10),
+                ("спрашивает про цены", 17),
+                ("пишет про атмосферу компании", 10),
+                ("делится впечатлением от сервиса", 10),
+                ("упоминает удобство сайта или приложения", 10),
+                ("говорит о гарантии", 10),
+                ("говорит о возврате", 10),
+                ("говорит о доставке", 3),
+            ])),
+            "add": maybe(15, lambda: weighted_choice([
+                ("продолжает обсуждение темы статьи", 20),
+                ("добавляет что-то новое", 20),
+                ("задаёт уточняющий вопрос", 10),
+                ("задаёт уточняющий вопрос одному из комментаторов (предыдущих)", 5, True),
+                ("выражает мнение без категоричности", 10),
+                ("комментирует работу персонала", 10),
+                ("даёт совет другим пользователям", 5, True),
+                ("даёт совет другому пользователю упоминая его ник/имя", 5, True),
+                ("пишет, что подумает обратиться снова", 5),
+                ("упоминает альтернативные варианты", 5),
+                ("упоминает время года или событие", 5),
+            ], num_reviews)),
+            "interaction": maybe(15, lambda: weighted_choice([
+                ("спрашивает совета у других пользователей", 15, True),
+                ("комментирует чужой отзыв", 35, True),
+                ("благодарит другого комментатора за полезную информацию", 15, True),
+                ("отвечает на вопрос другого пользователя, если вопрос был в других отзывах выше (предыдущих)", 15, True),
+                ("вовлекает других в обсуждение", 10, True),
+                ("соглашается с предыдущим отзывом", 5, True),
+                ("спорит с чужим мнением вежливо", 5, True),
+            ], num_reviews)),
+            "company_name_instruction": weighted_choice(company_name_variants),
+            "realism": maybe(70, lambda: weighted_choice(realism_variants))
+        }
+        # Удаляем пустые значения
+        data = {k: v for k, v in data.items() if v}
+        reviews_context.append(data)
+    # 🔸 Переносим «интерактивные» отзывы в конец
+    interactive = [r for r in reviews_context if "interaction" in r]
+    non_interactive = [r for r in reviews_context if "interaction" not in r]
+    return non_interactive + interactive
+
+
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseForbidden
+from django.utils.timezone import now
+import random
+
+def step_detail2(request, slug):
+    step = get_object_or_404(Step101, slug=slug, is_published=True)
+    comments = step.comments101.filter(is_published=True).order_by('-created_date')
+
+    # Количество сгенерированных отзывов (если у тебя есть генератор)
+    num = request.GET.get('num', 'random')
+    if num == 'random':
+        num_reviews = random.randint(1, 10)
+    else:
+        num_reviews = min(max(int(num), 1), 10)
+
+    # Если у тебя есть генерация "отзывов по контексту" — подключи её, иначе можно убрать
+    reviews_context = None
+    if 'generate_reviews_context' in globals():
+        reviews_context = generate_reviews_context(step=step, num_reviews=num_reviews)
+
+
+    if request.method == 'POST':
+        username = request.POST.get('name', '').strip()
+        text = request.POST.get('content', '').strip()
+        feedback_type = request.POST.get('feedback_type', '').strip()
+        fake_field = request.POST.get('fake_field', '').strip()
+
+        if fake_field:
+            return HttpResponseForbidden('Вы не можете отправлять комментарии.')
+
+        if username and text and feedback_type in ['positive', 'negative']:
+            username = username.replace('"', '').replace("'", '').replace('«', '').replace('»', '')
+            text = text.replace('"', '').replace("'", '').replace('«', '').replace('»', '')
+
+            if random.random() < 0.5:
+                username = username.replace('ё', 'е').replace('Ё', 'Е')
+            if random.random() < 0.95:
+                text = text.replace('ё', 'е').replace('Ё', 'Е')
+
+            is_positive = (feedback_type == 'positive')
+
+            Comment101.objects.create(
+                step=step,
+                username=username,
+                text=text,
+                is_positive=is_positive,
+                created_date=now(),
+                is_published=False
+            )
+
+            comments = step.comments101.filter(is_published=True).order_by('-created_date')
+
+
+    return render(request, 'data/step_detail2.html', {
+        'step': step,
+        'comments': comments,
+        'reviews_context': reviews_context,
+        'num_reviews': num_reviews,
+        'selected_num': num,
+    })
+
 
 
 
@@ -342,6 +606,8 @@ def step_detail(request, slug):
             'comments': comments,
         }
     )
+
+
 def add_comment(request, step_slug):
     comment_model_name = f"Comment{SUFFIX}"
     Comment = apps.get_model('data', comment_model_name)

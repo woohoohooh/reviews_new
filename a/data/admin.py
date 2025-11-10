@@ -28,7 +28,7 @@ class CommentInline(admin.TabularInline):
 # Админка для Step с комментариями
 @admin.register(globals()[f'Step{SUFFIX_101}'])
 class StepAdmin(admin.ModelAdmin):
-    list_display = ('keyword', 'subtopic', 'is_published')
+    list_display = ('h1', 'subtitle', 'is_published')
     actions = ['publish_selected']
     list_per_page = 50
     inlines = [CommentInline]
