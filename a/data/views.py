@@ -273,23 +273,24 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseForbidden
 from django.utils.timezone import now
 import random
-
 def step_detail2(request, slug):
-    step = get_object_or_404(Step101, slug=slug, is_published=True)
+    # Убираем фильтр is_published=True — теперь страница найдётся, даже если не опубликована
+    step = get_object_or_404(Step101, slug=slug)
+
+    # Можно при желании визуально отметить, что страница не опубликована
+    show_unpublished_notice = not step.is_published
+
     comments = step.comments101.filter(is_published=True).order_by('-created_date')
 
-    # Количество сгенерированных отзывов (если у тебя есть генератор)
     num = request.GET.get('num', 'random')
     if num == 'random':
         num_reviews = random.randint(1, 10)
     else:
         num_reviews = min(max(int(num), 1), 10)
 
-    # Если у тебя есть генерация "отзывов по контексту" — подключи её, иначе можно убрать
     reviews_context = None
     if 'generate_reviews_context' in globals():
         reviews_context = generate_reviews_context(step=step, num_reviews=num_reviews)
-
 
     if request.method == 'POST':
         username = request.POST.get('name', '').strip()
@@ -322,14 +323,15 @@ def step_detail2(request, slug):
 
             comments = step.comments101.filter(is_published=True).order_by('-created_date')
 
-
     return render(request, 'data/step_detail2.html', {
         'step': step,
         'comments': comments,
         'reviews_context': reviews_context,
         'num_reviews': num_reviews,
         'selected_num': num,
+        'show_unpublished_notice': show_unpublished_notice,  # <- можно использовать в шаблоне
     })
+
 
 
 

@@ -3580,6 +3580,23 @@ class Tag101(models.Model):
     def __str__(self):
         return self.name
 
+import re
+import os
+from django.db import models
+from django.core.exceptions import ValidationError
+from django.utils.timezone import now
+from django.utils.text import slugify
+from django.urls import reverse
+
+
+import os
+import re
+from django.db import models
+from django.utils.timezone import now
+from django.core.exceptions import ValidationError
+from django.urls import reverse
+from django.utils.text import slugify
+
 class Step101(models.Model):
     title = models.CharField(max_length=150, verbose_name="Заголовок title", blank=True, null=True)
     h1 = models.CharField(max_length=150, verbose_name="Заголовок h1")
@@ -3594,9 +3611,31 @@ class Step101(models.Model):
     image_alt_and_prompt = models.CharField(max_length=150, blank=True, null=True, verbose_name="Описание картинки")
     image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
     tags = models.ManyToManyField(Tag101, related_name="steps101", blank=True, verbose_name="теги")
-    subtopic = models.ForeignKey(Subtopic101, related_name='steps101', on_delete=models.CASCADE, db_index=True, verbose_name="Подтема", default=None)
-    author_type = models.ForeignKey(Author101, related_name='steps101', on_delete=models.CASCADE, verbose_name="Автор")
-    slug = models.SlugField(unique=True, db_index=True, allow_unicode=True, max_length=150, verbose_name="Слуг")
+    subtopic = models.ForeignKey(
+        Subtopic101,
+        related_name='steps101',
+        on_delete=models.CASCADE,
+        db_index=True,
+        verbose_name="Подтема",
+        default=None
+    )
+    author_type = models.ForeignKey(
+        Author101,
+        related_name='steps101',
+        on_delete=models.CASCADE,
+        verbose_name="Автор",
+        blank=True,
+        null=True
+    )
+    slug = models.SlugField(
+        unique=True,
+        db_index=True,
+        allow_unicode=True,
+        max_length=150,
+        verbose_name="Слуг",
+        blank=True,
+        null=True
+    )
     is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликовано")
     published_date = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name="Дата публикации")
     updated_date = models.DateTimeField(auto_now=True, db_index=True, verbose_name="Дата обновления")
@@ -3621,10 +3660,8 @@ class Step101(models.Model):
         return self.updated_date.strftime('%d.%m.%Y')
 
     def clean(self):
-        # title
         if self.title and len(self.title) > 150:
             raise ValidationError({'title': "Поле 'title' слишком длинное. Максимум 150 символов."})
-        # Остальные проверки как у тебя, включая description и т.д.
         if self.description and len(self.description) > 11000:
             raise ValidationError({'description': "Поле 'description' слишком длинное. Максимум 11000 символов."})
         if self.expert_opinion and len(self.expert_opinion) > 11000:
@@ -3632,20 +3669,33 @@ class Step101(models.Model):
 
     def save(self, *args, **kwargs):
         self.full_clean()
+
+        # дата публикации
         if self.is_published and not self.published_date:
             self.published_date = now()
+
+        # --- генерация slug автоматически ---
         if not self.slug:
-            base = self.title or self.h1
-            clean_title = base.strip().replace('\r', '').replace('\n', '')
-            self.slug = slugify(clean_title, allow_unicode=True)
+            base = self.keyword or self.h1 or self.title
+            if base:
+                clean_base = base.strip().replace('\r', '').replace('\n', '')
+                clean_base = re.sub(r'\s+', '-', clean_base)  # пробелы → дефисы
+                clean_base = re.sub(r'[^\w\-а-яА-ЯёЁ]', '', clean_base)  # убрать лишние символы
+                self.slug = slugify(clean_base, allow_unicode=True)
+
+        # имя файла картинки
         if self.image and not self.image_file_name:
             self.image_file_name = os.path.splitext(os.path.basename(self.image.name))[0]
-        # подставляем "Отзывы" по умолчанию, если есть
+
+        # подтема "Отзывы" по умолчанию
         if not self.subtopic_id:
             default_subtopic = Subtopic101.objects.filter(title__iexact="Отзывы").first()
             if default_subtopic:
                 self.subtopic = default_subtopic
+
         super().save(*args, **kwargs)
+
+
 
 
 

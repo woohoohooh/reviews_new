@@ -25,6 +25,8 @@ class CommentInline(admin.TabularInline):
     ordering = ('-created_date',)
     show_change_link = True
 
+
+
 @admin.register(globals()[f'Step{SUFFIX_101}'])
 class StepAdmin(admin.ModelAdmin):
     list_display = ('h1', 'subtitle', 'is_published')
@@ -55,10 +57,22 @@ class StepAdmin(admin.ModelAdmin):
         }),
     )
 
+    def get_changeform_initial_data(self, request):
+        """Устанавливаем значение 'Отзывы' по умолчанию в поле 'Подтема' при добавлении"""
+        initial = super().get_changeform_initial_data(request)
+        try:
+            default_subtopic = Subtopic101.objects.filter(title__iexact="Отзывы").first()
+            if default_subtopic:
+                initial['subtopic'] = default_subtopic.pk
+        except Exception:
+            pass
+        return initial
+
     @admin.action(description="Опубликовать выбранные шаги")
     def publish_selected(self, request, queryset):
         updated_count = queryset.update(is_published=True, published_date=timezone.now())
         self.message_user(request, f"{updated_count} шагов успешно опубликовано.")
+
 
 
 @admin.register(globals()[f'Comment{SUFFIX_101}'])
