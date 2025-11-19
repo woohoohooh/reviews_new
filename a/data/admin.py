@@ -2,6 +2,7 @@ import importlib
 from django.contrib import admin
 from django.utils import timezone
 from .abc import SUFFIX_101
+from .models import Subtopic101
 
 def load_model(model_name, suffix):
     try:
@@ -41,8 +42,10 @@ class StepAdmin(admin.ModelAdmin):
                 'subtitle',
                 'brands',
                 'keyword',
+                'slug',
                 'description',
                 'expert_opinion',
+                'plus_minus',
                 'keywords',
                 'seo_description',
                 'image_file_name',
@@ -51,7 +54,6 @@ class StepAdmin(admin.ModelAdmin):
                 'tags',
                 'subtopic',
                 'author_type',
-                'slug',
                 'is_published',
             )
         }),

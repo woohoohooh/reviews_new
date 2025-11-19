@@ -70,13 +70,14 @@ def extract_between(text, start, end):
 
 def test2(request):
 
-    steps_list = Step101.objects.filter(is_published=True).order_by('-published_date')
+    steps_list = Step101.objects.all().order_by('-published_date')
     paginator = Paginator(steps_list, 30)  # По 30 шагов на страницу
 
     page_number = request.GET.get('page')
     steps = paginator.get_page(page_number)
 
     return render(request, 'data/test2.html', {'steps': steps})
+
 
 
 
@@ -293,25 +294,26 @@ def step_detail2(request, slug):
         reviews_context = generate_reviews_context(step=step, num_reviews=num_reviews)
 
     if request.method == 'POST':
-        username = request.POST.get('name', '').strip()
-        text = request.POST.get('content', '').strip()
-        feedback_type = request.POST.get('feedback_type', '').strip()
         fake_field = request.POST.get('fake_field', '').strip()
-
         if fake_field:
             return HttpResponseForbidden('Вы не можете отправлять комментарии.')
 
+        # --- Форма Expert Opinion / PlusMinus ---
+        expert_opinion = request.POST.get('expert_opinion', '').strip()
+        plus_minus = request.POST.get('plus_minus', '').strip()
+
+        # Если отправили эти поля, сохраняем их в шаге
+        if expert_opinion or plus_minus:
+            step.expert_opinion = expert_opinion
+            step.plus_minus = plus_minus
+            step.save()
+
+        # --- Форма комментариев ---
+        username = request.POST.get('name', '').strip()
+        text = request.POST.get('content', '').strip()
+        feedback_type = request.POST.get('feedback_type', '').strip()
         if username and text and feedback_type in ['positive', 'negative']:
-            username = username.replace('"', '').replace("'", '').replace('«', '').replace('»', '')
-            text = text.replace('"', '').replace("'", '').replace('«', '').replace('»', '')
-
-            if random.random() < 0.5:
-                username = username.replace('ё', 'е').replace('Ё', 'Е')
-            if random.random() < 0.95:
-                text = text.replace('ё', 'е').replace('Ё', 'Е')
-
             is_positive = (feedback_type == 'positive')
-
             Comment101.objects.create(
                 step=step,
                 username=username,

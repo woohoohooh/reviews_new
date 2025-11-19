@@ -2,48 +2,129 @@
 {% block content %}
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
 <style>
-body {
-    font-family: 'Nunito', sans-serif;
+body { font-family: 'Nunito', sans-serif; }
+
+.form-container {
+    max-width: 100%;
+    width: 100%;
 }
+
+/* Вкладки */
+.tab {
+    overflow: hidden;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    transition: 0.3s;
+    font-size: 16px;
+}
+
+.tab button.active {
+    border-bottom: 3px solid #000;
+    font-weight: bold;
+}
+
+.tabcontent { display: none; }
+
+/* Поля формы */
+#name, #content, .btn-send, .company-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    font-size: 15px;
+    border: 1px solid #000;
+    border-radius: 6px;
+    resize: vertical;
+}
+
+#name { min-height: 35px; }
+#content { min-height: 40px; border-radius: 2px; }
+.company-textarea { min-height: 40px; }
+.btn-send { min-height: 40px; margin-top: 10px; }
 </style>
-<button onclick="location.href='/test2'">← Back</button>
-<select id="num_reviews">
-    <option value="random" {% if selected_num == 'random' %}selected{% endif %}>Random</option>
-    {% for i in "1234567890" %}
-        <option value="{{ forloop.counter }}" {% if selected_num == forloop.counter|stringformat:"s" %}selected{% endif %}>{{ forloop.counter }}</option>
-    {% endfor %}
-</select>
-<button onclick="location.href='?num=' + document.getElementById('num_reviews').value">Select</button><br><br><br>
-<hr><br>
-<form method="post" action="">
-    {% csrf_token %}
-    <div class="form-check"><br>
-        <input type="radio" class="form-check-input" id="positive" name="feedback_type" value="positive" checked>
-        <label class="form-check-label" for="positive">RECOMMEND</label>
-    </div><br>
-    <div class="form-check">
-        <input type="radio" class="form-check-input" id="negative" name="feedback_type" value="negative">
-        <label class="form-check-label" for="negative">NOT RECOMMEND</label>
-    </div><br><br>
-    <div class="form-group">
-        <label for="name">Name&nbsp;&nbsp;&nbsp;</label>
-        <input type="text" class="form-control" id="name" name="name" required>
-    </div><br>
-    <div class="form-group">
-        <label for="content">Review</label>
-        <textarea class="form-control" id="content" name="content" required></textarea>
-    </div><br>
-    <div style="display:none;">
-        <label for="fake_field">Не заполнять</label>
-        <input type="text" id="fake_field" name="fake_field">
+
+<div class="form-container">
+    <button onclick="location.href='/test2'">← Back</button>
+
+    <select id="num_reviews">
+        <option value="random" {% if selected_num == 'random' %}selected{% endif %}>Random</option>
+        {% for i in "1234567890" %}
+            <option value="{{ forloop.counter }}" {% if selected_num == forloop.counter|stringformat:"s" %}selected{% endif %}>{{ forloop.counter }}</option>
+        {% endfor %}
+    </select>
+    <button onclick="location.href='?num=' + document.getElementById('num_reviews').value">Select</button>
+<hr>
+
+    <div class="tab">
+        <button class="tablinks active" onclick="openTab(event, 'Expert')">Expert Opinion</button>
+        <button class="tablinks" onclick="openTab(event, 'AddReview')">Add Review</button>
     </div>
-    <br>
-    <button type="submit" class="btn btn-outline-secondary"><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SEND REVIEW&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br></button>
-</form><br>
-<hr><br><br>
-<div align="center">
-    <button onclick="copyText()"><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COPY PROMPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br><br></button>
+
+    <div id="Expert" class="tabcontent" style="display:block;">
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="plus_minus">Plus-minus</label>
+                <textarea id="plus_minus" name="plus_minus" class="company-textarea">{{ step.plus_minus }}</textarea>
+            </div><br>
+            <div class="form-group">
+                <label for="expert_opinion">Expert Opinion</label>
+                <textarea id="expert_opinion" name="expert_opinion" class="company-textarea">{{ step.expert_opinion }}</textarea>
+            </div><br>
+
+            <div style="display:none;">
+                <label for="fake_field">Не заполнять</label>
+                <input type="text" id="fake_field" name="fake_field">
+            </div>
+            <button type="submit" class="btn-send">SAVE EXPERT INFO</button>
+        </form>
+    </div>
+
+    <!-- Вкладка 2: Добавление отзывов -->
+    <div id="AddReview" class="tabcontent">
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="form-check"><br>
+                <input type="radio" class="form-check-input" id="positive" name="feedback_type" value="positive" checked>
+                <label class="form-check-label" for="positive">RECOMMEND</label>
+            </div><br>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" id="negative" name="feedback_type" value="negative">
+                <label class="form-check-label" for="negative">NOT RECOMMEND</label>
+            </div><br>
+
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div><br>
+
+            <div class="form-group">
+                <label for="content">Review</label>
+                <textarea class="form-control" id="content" name="content" required></textarea>
+            </div><br>
+
+            <div style="display:none;">
+                <label for="fake_field">Не заполнять</label>
+                <input type="text" id="fake_field" name="fake_field">
+            </div>
+            <button type="submit" class="btn-send">SEND REVIEW</button>
+        </form>
+    </div>
 </div>
+
+<hr><br>
+<div align="center">
+    <button onclick="copyText()" class="btn-send">COPY PROMPT</button>
+</div>
+
 <script>
 function copyText() {
     const copyText = document.getElementById("copy-text").innerText;
@@ -54,10 +135,22 @@ function copyText() {
     document.execCommand("copy");
     document.body.removeChild(tempInput);
 }
-</script><br><br>
-<hr><br>
+
+function openTab(evt, tabName) {
+    const tabcontent = document.getElementsByClassName("tabcontent");
+    for (let i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    const tablinks = document.getElementsByClassName("tablinks");
+    for (let i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.classList.add("active");
+}
+</script>
 <div id="copy-text">
-1. На мой сайт каталога компаний нужно сгенерировать {{ num_reviews }} уникальных отзывов по требованиям ниже:<br><br>
+1. На мой сайт отзывов нужно сгенерировать {{ num_reviews }} уникальных отзывов по требованиям ниже:<br><br>
 {% for review in reviews_context %}
 (Если тип был "нейтральный" или "позитивный", то напиши тут "🟢 RECOMMEND", если негативный, то "🔴 NOT RECOMMEND". Без лишних слов других и это первое что тут надо, имя и отзыв ниже.)<br>
 (Имя комментатора придуманное реалистичное, то есть, как обычно, в комментах бывает - иногда имя, иногда имя фамилия, иногда ник, и другие варианты, чтобы среди этих {{ num_reviews }} отзывов реалистичные имена/ники были - разнообразные очень варианты - то имя, то ник, то и то и другое в разных вариантах тоже, то имя и фамилия, то сокращения. И варианты генерируй уникальные, а то чета в каждом запросе "Анна К." у тебя почти - тупо совсем, когда на сайте миллиард отзывов постю, в каждом десятом Анна К, не делай так - макс рандомные, но ближе к вариантам РФ. И тут без лишних слов тока это, то есть не надо в начале типа "Имя:")<br>
@@ -75,7 +168,7 @@ function copyText() {
 {% if review.add %}- особенность: {{ review.add }};<br>{% endif %}
 {% if review.interaction %}- взаимодействует с другими (когда надо имя/ник указать другого комментатора, то из текущих других отзывов надо брать): {{ review.interaction }};<br>{% endif %}
 - имя бренда: {{ review.company_name_instruction }};<br>
-
+- начни отзыв с сути чтобы первые 30-150 символов были самого интересного из отзыва - что может быть наиболее интересно посетителям сайта при чтении отзыва и даст понять основное что хотел сказать комментатор, и чтобы это было первое предложение и после него точка, а потом другое.
 
 <br><br>
 {% endfor %}
@@ -83,6 +176,8 @@ function copyText() {
 3. Ответы без canvas, просто в чате.<br><br>
 4. Пиши всё 100% уникально и качественно.<br><br>
 5. Не повторяй в отзывах то, что уже написала (или планируешь) в других, то есть если в одном отзыве уже пишется про атмосферу (в офисе, при посещении и т.п.) или про то что заходил в офис/компанию или про персонал, ассортимент и т.д., то не пиши аналогичные слова (и в целом аналогично) в других.<br><br>
-6. Описание компании/товара/услуги: {{ step.description }}<br>
+6. Описание компании/товара/услуги для которой нужны отзывы: {{ step.h1 }} ({{ step.brands }})<br><br>
+7. И под ответом про описание еще надо кратко плюсы-минусы, типа над отзывами размещу: Вежливый персонал, Грязно, Дорого. Но эти примеры не используй - учитывай тематику этой компании/товара/услуги ({{ step.h1 }} ({{ step.brands }})) + погугли про этот ключевой запрос что нашла (пусть может даже и не точно, что это относилось к {{ step.h1 }} ({{ step.brands }})), и под нее дай спиоск плюсов/минусов таких порядка 35, часть позитивных, часть негативных. Не надо их из текущих сгенеренных отзывов, просто на основе что получится найти в Интернет (приоритет) про {{ step.h1 }} ({{ step.brands }}) или (если ничего не находится) - придумать реалистичные. И укажи перед положительными +, а отрицательными минус, чтобы при вставке на сайте они сразу подсвечивались как надо (я настрою), то есть типа "+Вежливый персонал,-Грязно,-Дорого". И все через запятую - в одно поле в админке добавлю, скрипт сам на сайте разобьет и разместит после. Тут пункт просто строку в ответ без пунктиров всяких в начале и после + и - не надо пробел - со словом вместе чтобы шло как тут в примере и указал - "+Вежливый персонал,-Грязно,-Дорого". Подпиши над ответом этим название "Plus-minus:"<br><br>
+8. Напиши уникальный экспресс-анализ отзывов о {{ step.h1 }} ({{ step.brands }}). ОБЪЕМ: 350-500 символов. ФОРМАТ: Единый текст без разделов. СОДЕРЖАТЬ: 1. Анализ тональности отзывов (главные претензии/похвалы); 2. 1-2 значимых факта из СМИ (если есть) - интегрировать в текст органично; 3. Практический вывод для пользователя. ТРЕБОВАНИЯ: - Естественный язык, как будто пишет человек; - Без шаблонных фраз "добро пожаловать", "наш анализ показал"; - Начинать каждый текст по-разному; - Если фактов из СМИ нет - делать акцент только на анализе отзывов. Подпиши над ответом этим название "Expert Opinion:"
 </div>
 {% endblock %}

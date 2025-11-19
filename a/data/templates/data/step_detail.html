@@ -1,13 +1,8 @@
 {% extends "data/base.html" %}
-
 {% block title %}{{ step.title }}{% endblock %}
-
 {% block description %}{{ step.seo_description }}{% endblock %}
-
 {% block keywords %}{{ step.keywords }}{% endblock %}
-
 {% load blog_extras %}
-
 {% block extra_head %}
 <script type="application/ld+json">
     {{ schema_data|safe|json_script:"application/ld+json" }}
@@ -16,12 +11,218 @@
     {{ schema_breadcrumbs|safe|json_script:"application/ld+json" }}
 </script>
 {% endblock %}
-
 {% block content %}
-
 <style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px 30px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        min-height: 80px;
+    }
+    .page-header h1 {
+        margin: 0;
+        font-size: 2.2rem;
+        font-weight: 700;
+    }
+    .page-header .subtitle {
+        font-size: 1.3rem;
+        opacity: 0.9;
+        font-weight: 400;
+    }
+    .rating-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.15);
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-weight: 600;
+    }
+    .rating-star {
+        color: #ffd700;
+        font-size: 1.3rem;
+    }
+    .rating-score {
+        font-size: 1.4rem;
+        font-weight: bold;
+    }
+    .rating-count {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    .date-edit-block {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 15px 0 25px;
+        padding: 0 10px;
+        font-size: 0.95rem;
+        color: #666;
+    }
+    .edit-link {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .edit-link:hover {
+        text-decoration: underline;
+    }
+    .expert-sidebar {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+        border: 1px solid #e0e0e0;
+    }
+    .expert-sidebar h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 1.4rem;
+    }
+    .expert-sidebar p {
+        font-size: 1.05rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    .expert-recommendation {
+        text-align: center;
+        margin-top: 20px;
+        padding: 12px;
+        background: #e8f5e8;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #2d5016;
+    }
+    .recommend-icon {
+        color: #28a745;
+        font-size: 1.2rem;
+        margin-right: 5px;
+    }
+    .pros-cons-section {
+        margin: 30px 0;
+    }
+    .pros-cons-section h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 1.3rem;
+    }
+    .pros-cons-section .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 25px;
+        font-size: 0.95rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .pros-cons-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    .pros-item, .cons-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+    .pros-item {
+        background: #f0f9f0;
+        border-color: #d4edda;
+    }
+    .cons-item {
+        background: #fdf2f2;
+        border-color: #f8d7da;
+    }
+    .pros-item:hover, .cons-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .item-text {
+        flex: 1;
+        font-size: 0.95rem;
+        font-weight: 500;
+        line-height: 1.3;
+    }
+    .vote-btn {
+        background: rgba(255,255,255,0.7);
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.2s ease;
+    }
+    .pros-item .vote-btn:hover {
+        background: #28a745;
+        color: white;
+        border-color: #28a745;
+    }
+    .cons-item .vote-btn:hover {
+        background: #dc3545;
+        color: white;
+        border-color: #dc3545;
+    }
+    .vote-count {
+        font-weight: 600;
+        font-size: 0.95rem;
+        min-width: 20px;
+        text-align: center;
+    }
+    .filters-section {
+        margin: 25px 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    .filters-section h4 {
+        margin: 0 0 15px 0;
+        color: #333;
+        font-size: 1.1rem;
+    }
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .filter-btn {
+        padding: 8px 16px;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+    .filter-btn:hover {
+        background: #f0f0f0;
+    }
+    .filter-btn.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
     .comments-section {
-        margin-top: 40px;
+        margin-top: 30px;
     }
     .comments-section ul {
         list-style: none;
@@ -30,13 +231,13 @@
     }
     .comment-item {
         margin-bottom: 20px;
-        padding: 15px;
+        padding: 18px;
         border: 1px solid #e0e0e0;
-        border-radius: 5px;
+        border-radius: 8px;
         background-color: #fcfcfc;
     }
     .comment-item strong {
-        font-size: 1.1em;
+        font-size: 1.05em;
         color: #333;
     }
     .comment-item p {
@@ -45,73 +246,173 @@
     }
     .comment-form textarea {
         width: 100%;
-        padding: 10px;
+        padding: 12px;
         border: 1px solid #ccc;
-        border-radius: 5px;
+        border-radius: 8px;
         resize: vertical;
+        font-family: inherit;
     }
     .comment-form button {
-        margin-top: 10px;
-        padding: 10px 20px;
+        margin-top: 12px;
+        padding: 10px 24px;
         border: none;
-        background-color: #007bff;
+        background-color: #667eea;
         color: white;
-        border-radius: 5px;
+        border-radius: 8px;
         cursor: pointer;
+        font-weight: 500;
     }
     .comment-form button:hover {
-        background-color: #0056b3;
+        background-color: #5a6fd8;
+    }
+    .content-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+        margin-top: 25px;
+    }
+    @media (max-width: 768px) {
+        .content-layout {
+            grid-template-columns: 1fr;
+        }
+        .page-header {
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+        .pros-cons-grid {
+            grid-template-columns: 1fr;
+        }
+        .filter-buttons {
+            justify-content: center;
+        }
     }
 </style>
 
-<div class="page-header" style="display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px;">
-    <h1 style="margin: 0;">{{ step.h1 }}</h1>
-    {% if step.subtitle %}
-        <span class="subtitle" style="font-size: 1.1rem; color: #777;">— {{ step.subtitle }}</span>
-    {% endif %}
+<div class="page-header">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <h1>1win</h1>
+        <span class="subtitle">— отзывы о выплатах</span>
+    </div>
+    <div class="rating-header">
+        <span class="rating-star">★</span>
+        <span class="rating-score">4.5</span>
+        <span class="rating-count">(247 отзывов)</span>
+    </div>
 </div>
 
+<div class="date-edit-block">
+    <span>{{ step.formatted_updated_date }}</span>
+    <a href="#" class="edit-link">Редактировать</a>
+</div>
 
-
-<p><p>{{ step.formatted_updated_date }}</p></p><br><br>
 {% if step.image %}
-    <img src="{{ step.image.url }}" alt="{{ step.image_alt }}" style="border-radius: 3px; max-width: 100%; height: auto;">
+    <img src="{{ step.image.url }}" alt="{{ step.image_alt }}" style="border-radius: 8px; max-width: 100%; height: auto; margin-bottom: 25px;">
 {% endif %}
-<p>{{ step.description|convert_markdown|safe }}</p>
 
-<div class="comments-section">
-    {% if comments %}
-        <ul id="comments-list">
-            {% for comment in comments %}
-                <li class="comment-item"
-                    style="border-left: 5px solid {% if comment.is_positive %}#007BFF{% else %}red{% endif %};
-                           padding-left: 10px;
-                           margin-bottom: 10px;">
+<div class="content-layout">
+    <div>
+        <div class="filters-section">
+            <h4>Фильтры и сортировка</h4>
+            <div class="filter-buttons">
+                <button class="filter-btn active">Все отзывы</button>
+                <button class="filter-btn">Сначала новые</button>
+                <button class="filter-btn">Сначала положительные</button>
+                <button class="filter-btn">Сначала отрицательные</button>
+                <button class="filter-btn">С высоким рейтингом</button>
+                <button class="filter-btn">🔥 Самое интересное</button>
+            </div>
+        </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <strong>{{ comment.username|default:"Аноним" }}</strong>
-                        {% if comment.created_date %}
-                            <span style="font-size: 0.9em; color: #888;">{{ comment.formatted_created_date }}</span>
-                        {% endif %}
-                    </div>
+        <h2 style="margin-bottom: 20px;">Отзывы о выплатах 1win</h2>
 
-                    <p>{{ comment.text|linebreaks }}</p>
+        <div class="comments-section">
+            {% if comments %}
+                <ul id="comments-list">
+                    {% for comment in comments %}
+                        <li class="comment-item"
+                            style="border-left: 5px solid {% if comment.is_positive %}#28a745{% else %}#dc3545{% endif %};
+                                   padding-left: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong>{{ comment.username|default:"Аноним" }}</strong>
+                                {% if comment.created_date %}
+                                    <span style="font-size: 0.9em; color: #888;">{{ comment.formatted_created_date }}</span>
+                                {% endif %}
+                            </div>
+                            <p>{{ comment.text|linebreaks }}</p>
+                            <span style="font-size: 0.9em; font-weight: bold; color: {% if comment.is_positive %}#28a745{% else %}#dc3545{% endif %};">
+                                {% if comment.is_positive %}Позитивный{% else %}Негативный{% endif %}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p id="no-comments">Комментариев пока нет.</p>
+            {% endif %}
+        </div>
+    </div>
 
-                    <span style="font-size: 0.9em; font-weight: bold; color: {% if comment.is_positive %}#007BFF{% else %}red{% endif %};">
-                        {% if comment.is_positive %}Позитивный{% else %}Негативный{% endif %}
-                    </span>
+    <div>
+        <div class="expert-sidebar">
+            <h3>Мнение эксперта</h3>
+            <p>Основная проблема — длительная верификация (до 7 дней). После неё выплаты быстрые (от 1 часа до 2 дней). Поддержка работает, но шаблонно. Бонусы щедрые, но вейджер высокий. Подходит опытным игрокам, новичкам лучше начинать с малых сумм.</p>
+            <div class="expert-recommendation">
+                <span class="recommend-icon">✓</span>
+                <span>Эксперт рекомендует</span>
+            </div>
+        </div>
 
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p id="no-comments">Комментариев пока нет.</p>
-    {% endif %}
+        <div class="pros-cons-section">
+            <h3>Основные достоинства и недостатки</h3>
+            <div class="subtitle">На основе анализа отзывов и информации из интернета</div>
+
+            <div class="pros-cons-grid">
+                <div class="pros-item" data-id="pro-1">
+                    <button class="vote-btn">+</button>
+                    <span class="item-text">Быстрые выплаты при успешной верификации</span>
+                    <span class="vote-count">24</span>
+                </div>
+                <div class="cons-item" data-id="con-1">
+                    <button class="vote-btn">+</button>
+                    <span class="item-text">Длительная верификация аккаунта</span>
+                    <span class="vote-count">32</span>
+                </div>
+                <div class="pros-item" data-id="pro-2">
+                    <button class="vote-btn">+</button>
+                    <span class="item-text">Удобный интерфейс личного кабинета</span>
+                    <span class="vote-count">18</span>
+                </div>
+                <div class="cons-item" data-id="con-2">
+                    <button class="vote-btn">+</button>
+                    <span class="item-text">Шаблонные ответы поддержки</span>
+                    <span class="vote-count">28</span>
+                </div>
+                <div class="pros-item" data-id="pro-3">
+                    <button class="vote-btn">+</button>
+                    <span class="item-text">Щедрая программа лояльности</span>
+                    <span class="vote-count">15</span>
+                </div>
+                <div class="cons-item" data-id="con-3">
+                    <button class="vote-btn">+</button>
+                    <span class="item-text">Сложные условия отыгрыша бонусов</span>
+                    <span class="vote-count">22</span>
+                </div>
+                <div class="pros-item" data-id="pro-4">
+                    <button class="vote-btn">+</button>
+                    <span class="item-text">Много способов вывода средств</span>
+                    <span class="vote-count">12</span>
+                </div>
+                <div class="cons-item" data-id="con-4">
+                    <button class="vote-btn">+</button>
+                    <span class="item-text">Периодические блокировки сайта</span>
+                    <span class="vote-count">19</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-
-
-    <form method="post" class="comment-form">
+<form method="post" class="comment-form">
     {% csrf_token %}
     <div style="display: none;">
         <label for="honey_pot">Оставьте это поле пустым</label>
@@ -119,12 +420,49 @@
     </div>
     {% if not user.is_authenticated %}
     <div>
-        <input type="text" name="user_name" id="user_name" placeholder="Ваше имя" required>
+        <input type="text" name="user_name" id="user_name" placeholder="Ваше имя" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px;">
     </div>
     {% endif %}
-    <textarea name="content" rows="3" placeholder="Оставьте комментарий..." required></textarea>
+    <textarea name="content" rows="4" placeholder="Оставьте комментарий..." required></textarea>
     <button type="submit">Отправить</button>
-    </form>
+</form>
 
-</div>
+<script>
+    // Voting functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const voteButtons = document.querySelectorAll('.vote-btn');
+
+        voteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const listItem = this.closest('.pros-item, .cons-item');
+                const voteCount = listItem.querySelector('.vote-count');
+                const currentCount = parseInt(voteCount.textContent);
+
+                // Visual feedback
+                const isPros = listItem.classList.contains('pros-item');
+                this.style.background = isPros ? '#28a745' : '#dc3545';
+                this.style.borderColor = isPros ? '#28a745' : '#dc3545';
+                this.style.color = 'white';
+                this.textContent = '✓';
+
+                voteCount.textContent = currentCount + 1;
+
+                this.disabled = true;
+
+                console.log('Voted for:', listItem.getAttribute('data-id'));
+            });
+        });
+
+        // Filter buttons functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                console.log('Filter changed to:', this.textContent);
+            });
+        });
+    });
+</script>
 {% endblock %}

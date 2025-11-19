@@ -3486,7 +3486,6 @@ class Comment018(models.Model):
 
 # 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101 101
 
-
 class Author101(models.Model):
     type = models.CharField(max_length=100)
     title = models.CharField(max_length=150, verbose_name="Заголовок title")
@@ -3495,15 +3494,17 @@ class Author101(models.Model):
     description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
     h1 = models.CharField(max_length=150, verbose_name="Заголовок h1")
     image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
-    image_file_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Название картинки для файла")
+    image_file_name = models.CharField(max_length=150, blank=True, null=True,
+                                       verbose_name="Название картинки для файла")
     is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликовано")
+
     class Meta:
         verbose_name = AUTHOR_VERBOSE_NAME_101
         verbose_name_plural = AUTHOR_VERBOSE_NAME_101
+
     def __str__(self):
         return self.type
-    # def get_absolute_url(self):
-    #     return reverse('author_detail', args=[self.id])
+
 
 class Topic101(models.Model):
     slug = models.SlugField(unique=True, allow_unicode=True, max_length=150)
@@ -3513,17 +3514,22 @@ class Topic101(models.Model):
     description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
     h1 = models.CharField(max_length=150, blank=True, null=True, verbose_name="Заголовок h1")
     image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
-    image_file_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Название картинки для файла")
+    image_file_name = models.CharField(max_length=150, blank=True, null=True,
+                                       verbose_name="Название картинки для файла")
     image_alt_and_prompt = models.CharField(max_length=150, blank=True, null=True, verbose_name="Описание картинки")
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = custom_slugify(self.title)
         super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = TOPIC_VERBOSE_NAME_101
         verbose_name_plural = TOPIC_VERBOSE_NAME_101
+
     def __str__(self):
         return self.title
+
     def get_absolute_url(self):
         return reverse('subtopic_list', args=[self.slug])
 
@@ -3536,20 +3542,25 @@ class Subtopic101(models.Model):
     description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
     h1 = models.CharField(max_length=150, blank=True, null=True, verbose_name="Заголовок h1")
     image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
-    image_file_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Название картинки для файла")
+    image_file_name = models.CharField(max_length=150, blank=True, null=True,
+                                       verbose_name="Название картинки для файла")
     image_alt_and_prompt = models.CharField(max_length=150, blank=True, null=True, verbose_name="Описание картинки")
     topic = models.ForeignKey(Topic101, related_name='subtopics101', on_delete=models.CASCADE, null=True, blank=True)
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = custom_slugify(self.title)
         if self.image and not self.image_file_name:
             self.image_file_name = os.path.splitext(os.path.basename(self.image.name))[0]
         super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = SUBTOPIC_VERBOSE_NAME_101
         verbose_name_plural = SUBTOPIC_VERBOSE_NAME_101
+
     def __str__(self):
         return self.title
+
     def get_absolute_url(self):
         return reverse('subtopic_list', args=[self.slug])
 
@@ -3559,43 +3570,32 @@ class Tag101(models.Model):
     slug = models.SlugField(unique=True, max_length=100, verbose_name="Слаг")
 
     class Meta:
-        db_table = "tag101"  # Явное указание таблицы
+        db_table = "tag101"
         verbose_name = TAGS_VERBOSE_NAME_101
         verbose_name_plural = TAGS_VERBOSE_NAME_101
         ordering = ['name']
 
     def save(self, *args, **kwargs):
-        if not self.slug:  # Генерация слага только если он не задан
+        if not self.slug:
             self.slug = slugify(self.name.lower(), allow_unicode=True)
-
-            # Проверка уникальности слага
             base_slug = self.slug
             counter = 1
             while Tag101.objects.filter(slug=self.slug).exists():
                 self.slug = f"{base_slug}-{counter}"
                 counter += 1
-
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
 
-import re
-import os
-from django.db import models
-from django.core.exceptions import ValidationError
-from django.utils.timezone import now
-from django.utils.text import slugify
-from django.urls import reverse
-
 
 import os
 import re
 from django.db import models
-from django.utils.timezone import now
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.text import slugify
+
 
 class Step101(models.Model):
     title = models.CharField(max_length=150, verbose_name="Заголовок title", blank=True, null=True)
@@ -3604,10 +3604,13 @@ class Step101(models.Model):
     brands = models.CharField(max_length=150, verbose_name="Бренды")
     keyword = models.CharField(max_length=150, blank=True, null=True, unique=True, verbose_name="Ключевая фраза")
     description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
+    plus_minus = models.TextField('Плюсы и Минусы', blank=True, default='', max_length=1000)
     expert_opinion = models.TextField(blank=True, verbose_name="Экспертное мнение", max_length=11000)
+    expert_recommendation = models.BooleanField(default=False, verbose_name="Рекомендует")
     keywords = models.CharField(max_length=250, blank=True, null=True, verbose_name="Ключевые фразы")
     seo_description = models.CharField(max_length=350, blank=True, null=True, verbose_name="Дискрипшн")
-    image_file_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Название картинки для файла")
+    image_file_name = models.CharField(max_length=150, blank=True, null=True,
+                                       verbose_name="Название картинки для файла")
     image_alt_and_prompt = models.CharField(max_length=150, blank=True, null=True, verbose_name="Описание картинки")
     image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
     tags = models.ManyToManyField(Tag101, related_name="steps101", blank=True, verbose_name="теги")
@@ -3670,24 +3673,20 @@ class Step101(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()
 
-        # дата публикации
         if self.is_published and not self.published_date:
             self.published_date = now()
 
-        # --- генерация slug автоматически ---
         if not self.slug:
             base = self.keyword or self.h1 or self.title
             if base:
                 clean_base = base.strip().replace('\r', '').replace('\n', '')
-                clean_base = re.sub(r'\s+', '-', clean_base)  # пробелы → дефисы
-                clean_base = re.sub(r'[^\w\-а-яА-ЯёЁ]', '', clean_base)  # убрать лишние символы
+                clean_base = re.sub(r'\s+', '-', clean_base)
+                clean_base = re.sub(r'[^\w\-а-яА-ЯёЁ]', '', clean_base)
                 self.slug = slugify(clean_base, allow_unicode=True)
 
-        # имя файла картинки
         if self.image and not self.image_file_name:
             self.image_file_name = os.path.splitext(os.path.basename(self.image.name))[0]
 
-        # подтема "Отзывы" по умолчанию
         if not self.subtopic_id:
             default_subtopic = Subtopic101.objects.filter(title__iexact="Отзывы").first()
             if default_subtopic:
@@ -3696,42 +3695,86 @@ class Step101(models.Model):
         super().save(*args, **kwargs)
 
 
-
+from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils.timezone import now
 
 
 class Comment101(models.Model):
-    step = models.ForeignKey('Step101', on_delete=models.CASCADE, related_name='comments101', db_index=True, verbose_name="Шаг")
-    username = models.CharField(max_length=100, default="Аноним", verbose_name="Имя пользователя")
-    text = models.TextField(verbose_name="Текст комментария")
-    is_positive = models.BooleanField(default=False, db_index=True, verbose_name="Позитивный комментарий")
-    created_date = models.DateTimeField(default=now, verbose_name="Дата создания")
-    is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликован")
-    published_date = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name="Дата одобрения")
+    step = models.ForeignKey(
+        'Step101',
+        on_delete=models.CASCADE,
+        related_name='comments101',
+        db_index=True,
+        verbose_name="Шаг"
+    )
+
+    username = models.CharField(
+        max_length=100,
+        default="Аноним",
+        verbose_name="Имя пользователя"
+    )
+
+    text = models.TextField(
+        verbose_name="Текст комментария"
+    )
+
+    is_positive = models.BooleanField(
+        default=False,
+        db_index=True,
+        verbose_name="Позитивный комментарий"
+    )
+
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        default=5,
+        db_index=True,
+        verbose_name="Оценка (1–5)"
+    )
+
+    created_date = models.DateTimeField(
+        default=now,
+        verbose_name="Дата создания"
+    )
+
+    is_published = models.BooleanField(
+        default=False,
+        db_index=True,
+        verbose_name="Опубликован"
+    )
+
+    published_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        db_index=True,
+        verbose_name="Дата одобрения"
+    )
+
     def save(self, *args, **kwargs):
         if self.is_published and not self.published_date:
             self.published_date = now()
         elif not self.is_published:
             self.published_date = None
+
         super().save(*args, **kwargs)
+
     class Meta:
         indexes = [
             models.Index(fields=['step', 'is_published', 'published_date']),
+            models.Index(fields=['rating']),
         ]
         verbose_name = COMMENTS_VERBOSE_NAME_101
         verbose_name_plural = COMMENTS_VERBOSE_NAME_101
+
     def __str__(self):
         return f"Комментарий от {self.username} ({self.created_date:%d.%m.%Y})"
+
     @property
     def formatted_created_date(self):
-        """Возвращает дату создания в формате 'дд.мм.гггг'."""
         return self.created_date.strftime('%d.%m.%Y')
 
 
-
 # ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001
-
-
-
 
 def custom_slugify2(value):
     value = re.sub(r'[^\w\s\-]', '', value)
@@ -3739,16 +3782,20 @@ def custom_slugify2(value):
     value = value.lower()
     return value
 
+
 class ZRubrics001(models.Model):
     name_original = models.CharField('Рубрика', max_length=1000, null=True, blank=True, default='')
     visible = models.BooleanField('Отображать', default=False)
     slug = models.SlugField(unique=True, allow_unicode=True, max_length=1000)
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = custom_slugify2(self.name_original)
         super().save(*args, **kwargs)
+
     def __str__(self):
         return str(self.name_original)
+
 
 class ZCompany001(models.Model):
     rubrics = models.ManyToManyField('ZRubrics001', blank=True)
@@ -3766,6 +3813,9 @@ class ZCompany001(models.Model):
     ads_article = models.CharField('Инфо', max_length=3000, blank=True, default='')
     article_warning = models.CharField('Доп инфо', max_length=1000, blank=True, default='')
     description = models.TextField('Описание', blank=True, default='')
+    plus_minus = models.TextField('Плюсы и Минусы', blank=True, default='')
+    expert_opinion = models.TextField('Экспертное мнение', blank=True, default='', max_length=11000)
+    expert_recommendation = models.BooleanField('Рекомендует', default=False)
     visible = models.BooleanField('Отображать', default=True, null=True)
     pro = models.BooleanField('PRO', null=True, default=False)
     slug = models.SlugField(unique=True, allow_unicode=True, max_length=1000)
@@ -3779,42 +3829,81 @@ class ZCompany001(models.Model):
     def __str__(self):
         return str(self.org_name1)
 
-    # 👇 Новые удобные методы:
     def comments_published(self):
-        """Вернуть только опубликованные комментарии"""
         return self.zcomments001.filter(published=True)
 
     def comments_count(self):
-        """Сколько комментариев всего"""
         return self.zcomments001.count()
 
     def positive_count(self):
-        """Сколько положительных"""
         return self.zcomments001.filter(is_positive=True).count()
 
     def negative_count(self):
-        """Сколько отрицательных"""
         return self.zcomments001.filter(is_positive=False).count()
+
 
 class ZCompanyRubrics001(models.Model):
     company = models.ForeignKey(ZCompany001, on_delete=models.CASCADE)
     rubric = models.ForeignKey(ZRubrics001, on_delete=models.CASCADE)
 
+
+from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
+
 class ZComment001(models.Model):
-    company = models.ForeignKey('ZCompany001', on_delete=models.CASCADE, related_name='zcomments001')
-    name = models.CharField(max_length=300, default='Anonymous')
+    company = models.ForeignKey(
+        'ZCompany001',
+        on_delete=models.CASCADE,
+        related_name='zcomments001'
+    )
+
+    name = models.CharField(
+        max_length=300,
+        default='Anonymous'
+    )
+
     content = models.TextField()
-    is_positive = models.BooleanField(default=True)
-    published = models.BooleanField('Is published', default=False)
-    created_at = models.DateTimeField(null=True, blank=True)
+
+    is_positive = models.BooleanField(
+        default=True
+    )
+
+    published = models.BooleanField(
+        'Is published',
+        default=False
+    )
+
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        default=5,
+        db_index=True,
+        verbose_name="Оценка (1–5)"
+    )
+
+    created_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
 
     def save(self, *args, **kwargs):
-        # ✅ если только что опубликован — обновляем дату
+        if self.created_at is None:
+            self.created_at = timezone.now()
+
         if self.published:
             self.created_at = timezone.now()
+
         super().save(*args, **kwargs)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['company', 'published', 'created_at']),
+            models.Index(fields=['rating']),
+        ]
+
+    def __str__(self):
+        return f"{self.name} ({self.created_at:%d.%m.%Y})"
 
 
 class ZFileTracker001(models.Model):
