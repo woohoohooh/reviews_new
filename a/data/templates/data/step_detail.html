@@ -291,13 +291,20 @@
 
 <div class="page-header">
     <div style="display: flex; align-items: center; gap: 15px;">
-        <h1>1win</h1>
-        <span class="subtitle">— отзывы о выплатах</span>
+        <h1>{{ step.h1 }}</h1>
+        {% if step.subtitle %}
+        <span class="subtitle">— {{ step.subtitle }}</span>
+        {% endif %}
     </div>
-    <div class="rating-header">
+        <div class="rating-header">
         <span class="rating-star">★</span>
-        <span class="rating-score">4.5</span>
-        <span class="rating-count">(247 отзывов)</span>
+        {% if total_comments > 0 %}
+            <span class="rating-score">{{ avg_rating }}</span>
+            <span class="rating-count">({{ total_comments }} отзыв{{ total_comments|pluralize:"ов" }})</span>
+        {% else %}
+            <span class="rating-score">0.0</span>
+            <span class="rating-count">(нет отзывов)</span>
+        {% endif %}
     </div>
 </div>
 
@@ -307,7 +314,7 @@
 </div>
 
 {% if step.image %}
-    <img src="{{ step.image.url }}" alt="{{ step.image_alt }}" style="border-radius: 8px; max-width: 100%; height: auto; margin-bottom: 25px;">
+    <img src="{{ step.image.url }}" alt="{{ step.image_alt_and_prompt|default:step.h1 }}" style="border-radius: 8px; max-width: 100%; height: auto; margin-bottom: 25px;">
 {% endif %}
 
 <div class="content-layout">
@@ -324,7 +331,7 @@
             </div>
         </div>
 
-        <h2 style="margin-bottom: 20px;">Отзывы о выплатах 1win</h2>
+        <h2 style="margin-bottom: 20px;">{{ step.description|truncatewords:20 }}</h2>
 
         <div class="comments-section">
             {% if comments %}
@@ -340,9 +347,14 @@
                                 {% endif %}
                             </div>
                             <p>{{ comment.text|linebreaks }}</p>
-                            <span style="font-size: 0.9em; font-weight: bold; color: {% if comment.is_positive %}#28a745{% else %}#dc3545{% endif %};">
-                                {% if comment.is_positive %}Позитивный{% else %}Негативный{% endif %}
-                            </span>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 0.9em; font-weight: bold; color: {% if comment.is_positive %}#28a745{% else %}#dc3545{% endif %};">
+                                    {% if comment.is_positive %}Позитивный{% else %}Негативный{% endif %}
+                                </span>
+                                <span style="font-size: 0.9em; color: #666;">
+                                    Рейтинг: {{ comment.rating }}/5
+                                </span>
+                            </div>
                         </li>
                     {% endfor %}
                 </ul>
@@ -353,23 +365,30 @@
     </div>
 
     <div>
+        {% if step.expert_opinion %}
         <div class="expert-sidebar">
             <h3>Мнение эксперта</h3>
-            <p>Основная проблема — длительная верификация (до 7 дней). После неё выплаты быстрые (от 1 часа до 2 дней). Поддержка работает, но шаблонно. Бонусы щедрые, но вейджер высокий. Подходит опытным игрокам, новичкам лучше начинать с малых сумм.</p>
+            <p>{{ step.expert_opinion }}</p>
+            {% if step.expert_recommendation %}
             <div class="expert-recommendation">
                 <span class="recommend-icon">✓</span>
                 <span>Эксперт рекомендует</span>
             </div>
+            {% endif %}
         </div>
+        {% endif %}
 
+        {% if step.plus_minus %}
         <div class="pros-cons-section">
             <h3>Основные достоинства и недостатки</h3>
             <div class="subtitle">На основе анализа отзывов и информации из интернета</div>
 
             <div class="pros-cons-grid">
+                {# Здесь можно парсить step.plus_minus для разделения на плюсы и минусы #}
+                {# Пока просто выводим как есть, можно доработать логику парсинга #}
                 <div class="pros-item" data-id="pro-1">
                     <button class="vote-btn">+</button>
-                    <span class="item-text">Быстрые выплаты при успешной верификации</span>
+                    <span class="item-text">{{ step.plus_minus|truncatewords:10 }}</span>
                     <span class="vote-count">24</span>
                 </div>
                 <div class="cons-item" data-id="con-1">
@@ -377,38 +396,9 @@
                     <span class="item-text">Длительная верификация аккаунта</span>
                     <span class="vote-count">32</span>
                 </div>
-                <div class="pros-item" data-id="pro-2">
-                    <button class="vote-btn">+</button>
-                    <span class="item-text">Удобный интерфейс личного кабинета</span>
-                    <span class="vote-count">18</span>
-                </div>
-                <div class="cons-item" data-id="con-2">
-                    <button class="vote-btn">+</button>
-                    <span class="item-text">Шаблонные ответы поддержки</span>
-                    <span class="vote-count">28</span>
-                </div>
-                <div class="pros-item" data-id="pro-3">
-                    <button class="vote-btn">+</button>
-                    <span class="item-text">Щедрая программа лояльности</span>
-                    <span class="vote-count">15</span>
-                </div>
-                <div class="cons-item" data-id="con-3">
-                    <button class="vote-btn">+</button>
-                    <span class="item-text">Сложные условия отыгрыша бонусов</span>
-                    <span class="vote-count">22</span>
-                </div>
-                <div class="pros-item" data-id="pro-4">
-                    <button class="vote-btn">+</button>
-                    <span class="item-text">Много способов вывода средств</span>
-                    <span class="vote-count">12</span>
-                </div>
-                <div class="cons-item" data-id="con-4">
-                    <button class="vote-btn">+</button>
-                    <span class="item-text">Периодические блокировки сайта</span>
-                    <span class="vote-count">19</span>
-                </div>
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 

@@ -274,9 +274,14 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseForbidden
 from django.utils.timezone import now
 import random
+
+
 def step_detail2(request, slug):
     # Убираем фильтр is_published=True — теперь страница найдётся, даже если не опубликована
     step = get_object_or_404(Step101, slug=slug)
+
+    message = ''  # для уведомления о сохранении
+    active_tab = 'Expert'  # по умолчанию активная вкладка
 
     # Можно при желании визуально отметить, что страница не опубликована
     show_unpublished_notice = not step.is_published
@@ -298,32 +303,41 @@ def step_detail2(request, slug):
         if fake_field:
             return HttpResponseForbidden('Вы не можете отправлять комментарии.')
 
-        # --- Форма Expert Opinion / PlusMinus ---
-        expert_opinion = request.POST.get('expert_opinion', '').strip()
-        plus_minus = request.POST.get('plus_minus', '').strip()
+        # Определяем, какая форма была отправлена
+        if 'expert_opinion' in request.POST:
+            # --- Форма Expert Opinion / PlusMinus ---
+            expert_opinion = request.POST.get('expert_opinion', '').strip()
+            plus_minus = request.POST.get('plus_minus', '').strip()
+            expert_recommendation = request.POST.get('expert_recommendation') == 'on'
 
-        # Если отправили эти поля, сохраняем их в шаге
-        if expert_opinion or plus_minus:
-            step.expert_opinion = expert_opinion
-            step.plus_minus = plus_minus
-            step.save()
+            # Если отправили эти поля, сохраняем их в шаге
+            if expert_opinion or plus_minus or 'expert_recommendation' in request.POST:
+                step.expert_opinion = expert_opinion
+                step.plus_minus = plus_minus
+                step.expert_recommendation = expert_recommendation
+                step.save()
+                message = 'UPDATED!'  # сообщение для шаблона
+                active_tab = 'Expert'
 
-        # --- Форма комментариев ---
-        username = request.POST.get('name', '').strip()
-        text = request.POST.get('content', '').strip()
-        feedback_type = request.POST.get('feedback_type', '').strip()
-        if username and text and feedback_type in ['positive', 'negative']:
-            is_positive = (feedback_type == 'positive')
-            Comment101.objects.create(
-                step=step,
-                username=username,
-                text=text,
-                is_positive=is_positive,
-                created_date=now(),
-                is_published=False
-            )
+        elif 'name' in request.POST and 'content' in request.POST:
+            # --- Форма комментариев ---
+            username = request.POST.get('name', '').strip()
+            text = request.POST.get('content', '').strip()
+            feedback_type = request.POST.get('feedback_type', '').strip()
+            if username and text and feedback_type in ['positive', 'negative']:
+                is_positive = (feedback_type == 'positive')
+                Comment101.objects.create(
+                    step=step,
+                    username=username,
+                    text=text,
+                    is_positive=is_positive,
+                    created_date=now(),
+                    is_published=False
+                )
+                message = 'ADDED!'  # сообщение для шаблона
+                active_tab = 'AddReview'
 
-            comments = step.comments101.filter(is_published=True).order_by('-created_date')
+                comments = step.comments101.filter(is_published=True).order_by('-created_date')
 
     return render(request, 'data/step_detail2.html', {
         'step': step,
@@ -331,7 +345,9 @@ def step_detail2(request, slug):
         'reviews_context': reviews_context,
         'num_reviews': num_reviews,
         'selected_num': num,
-        'show_unpublished_notice': show_unpublished_notice,  # <- можно использовать в шаблоне
+        'show_unpublished_notice': show_unpublished_notice,
+        'message': message,
+        'active_tab': active_tab,  # передаем активную вкладку в шаблон
     })
 
 
@@ -563,6 +579,10 @@ def subtopic_list(request, slug):
     steps = getattr(subtopic, steps_field).filter(is_published=True).order_by('-published_date')
     return render(request, f'data/subtopic_list.html', {'subtopic': subtopic, 'steps': steps})
 
+
+from django.db.models import Avg
+
+
 def step_detail(request, slug):
     step_model_name = f"Step{SUFFIX}"
     comment_model_name = f"Comment{SUFFIX}"
@@ -579,8 +599,15 @@ def step_detail(request, slug):
     steps = getattr(subtopic, steps_field).all()
     comments_field = f"comments{SUFFIX}"
 
-    # Добавляем выборку is_positive
+    # Добавляем выборку is_positive и вычисляем средний рейтинг
     comments = getattr(step, comments_field).filter(is_published=True).order_by('-published_date')
+
+    # Вычисляем средний рейтинг во view
+    avg_rating = comments.aggregate(avg_rating=Avg('rating'))['avg_rating']
+    if avg_rating:
+        avg_rating = round(avg_rating, 1)
+    else:
+        avg_rating = "0.0"
 
     if request.method == 'POST':
         honey_pot_value = request.POST.get('honey_pot', '').strip()
@@ -610,21 +637,8 @@ def step_detail(request, slug):
             'subtopic': subtopic,
             'step': step,
             'steps': steps,
-            'comments': comments,  # Теперь comments содержит is_positive
-        }
-    )
-
-
-    # Рендеринг страницы
-    return render(
-        request,
-        f'data/step_detail.html',
-        {
-            'topic': topic,
-            'subtopic': subtopic,
-            'step': step,
-            'steps': steps,
             'comments': comments,
+            'avg_rating': avg_rating,  # Передаем вычисленный рейтинг в контекст
         }
     )
 
