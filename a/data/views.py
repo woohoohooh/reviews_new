@@ -321,9 +321,31 @@ def step_detail2(request, slug):
             step.possible_tags = possible_tags
             step.description = description
 
+            # получаем имя/строку автора из формы
+            author_expert_name = request.POST.get('author_expert', '').strip()
+
+            if author_expert_name:
+                # сначала пытаемся найти по title (чувствительность игнорируем) или по type
+                author = Author101.objects.filter(title__iexact=author_expert_name).first()
+                if not author:
+                    author = Author101.objects.filter(type__iexact=author_expert_name).first()
+
+                # если не нашли — создаём минимальную запись (type + title + h1)
+                if not author:
+                    author = Author101.objects.create(
+                        type=author_expert_name,
+                        title=author_expert_name,
+                        h1=author_expert_name,
+                        is_published=False
+                    )
+
+                step.author_type = author
+
             step.save()
             message = 'UPDATED!'
             active_tab = 'Expert'
+
+
 
 
         elif 'name' in request.POST and 'content' in request.POST:

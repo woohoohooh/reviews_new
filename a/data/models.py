@@ -3778,6 +3778,24 @@ class Comment101(models.Model):
 
 # ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001
 
+class ZAuthor001(models.Model):
+    type = models.CharField(max_length=100)
+    title = models.CharField(max_length=150, verbose_name="Заголовок title")
+    keywords = models.CharField(max_length=250, blank=True, null=True, verbose_name="Ключевые фразы")
+    seo_description = models.CharField(max_length=350, blank=True, null=True, verbose_name="Дискрипшн")
+    description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
+    h1 = models.CharField(max_length=150, verbose_name="Заголовок h1")
+    image = models.ImageField(upload_to='authors/', blank=True, null=True, verbose_name="Картинка")
+    image_file_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Название картинки для файла")
+    is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликовано")
+
+    class Meta:
+        verbose_name = "ZAuthor001"
+        verbose_name_plural = "ZAuthor001"
+
+    def __str__(self):
+        return self.type
+
 def custom_slugify2(value):
     value = re.sub(r'[^\w\s\-]', '', value)
     value = re.sub(r'\s+', '-', value)
@@ -3818,6 +3836,12 @@ class ZCompany001(models.Model):
     plus_minus = models.TextField('Плюсы и Минусы', blank=True, default='')
     expert_opinion = models.TextField('Экспертное мнение', blank=True, default='', max_length=11000)
     expert_recommendation = models.BooleanField('Рекомендует', default=False)
+
+    # 🔥 новое поле — автор экспертного мнения
+    author_expert = models.ForeignKey(
+        'ZAuthor001', blank=True, null=True, on_delete=models.SET_NULL, verbose_name="Автор экспертного мнения"
+    )
+
     visible = models.BooleanField('Отображать', default=True, null=True)
     pro = models.BooleanField('PRO', null=True, default=False)
     slug = models.SlugField(unique=True, allow_unicode=True, max_length=1000)
@@ -3832,18 +3856,6 @@ class ZCompany001(models.Model):
 
     def __str__(self):
         return str(self.org_name1)
-
-    def comments_published(self):
-        return self.zcomments001.filter(published=True)
-
-    def comments_count(self):
-        return self.zcomments001.count()
-
-    def positive_count(self):
-        return self.zcomments001.filter(is_positive=True).count()
-
-    def negative_count(self):
-        return self.zcomments001.filter(is_positive=False).count()
 
 
 class ZCompanyRubrics001(models.Model):

@@ -121,6 +121,16 @@ body { font-family: 'Nunito', sans-serif; }
                 <label for="expert_opinion">Expert Opinion:</label>
                 <textarea id="expert_opinion" name="expert_opinion" class="company-textarea">{{ step.expert_opinion }}</textarea>
             </div>
+            <div class="form-group">
+                <label for="author_expert">Author Expert:</label>
+                <input type="text"
+                       id="author_expert"
+                       name="author_expert"
+                       class="company-textarea"
+                       placeholder="Введите автора (title или type)"
+                       value="{% if step.author_type %}{{ step.author_type.title }}{% endif %}">
+            </div><br>
+
 
             <!-- Галка для Expert Recommendation -->
             <div class="expert-checkbox">
