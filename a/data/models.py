@@ -3642,6 +3642,8 @@ class Step101(models.Model):
     is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликовано")
     published_date = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name="Дата публикации")
     updated_date = models.DateTimeField(auto_now=True, db_index=True, verbose_name="Дата обновления")
+    possible_categories = models.TextField('Возможные категории', blank=True, default='')
+    possible_tags = models.TextField('Возможные теги', blank=True, default='')
 
     class Meta:
         indexes = [
@@ -3820,6 +3822,8 @@ class ZCompany001(models.Model):
     pro = models.BooleanField('PRO', null=True, default=False)
     slug = models.SlugField(unique=True, allow_unicode=True, max_length=1000)
     logo = models.ImageField(upload_to='logos/', blank=True, null=True)
+    possible_categories = models.TextField('Возможные категории', blank=True, default='')
+    possible_tags = models.TextField('Возможные теги', blank=True, default='')
 
     def save(self, *args, **kwargs):
         if not self.slug:

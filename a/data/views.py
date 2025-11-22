@@ -305,19 +305,26 @@ def step_detail2(request, slug):
 
         # Определяем, какая форма была отправлена
         if 'expert_opinion' in request.POST:
-            # --- Форма Expert Opinion / PlusMinus ---
             expert_opinion = request.POST.get('expert_opinion', '').strip()
             plus_minus = request.POST.get('plus_minus', '').strip()
             expert_recommendation = request.POST.get('expert_recommendation') == 'on'
 
-            # Если отправили эти поля, сохраняем их в шаге
-            if expert_opinion or plus_minus or 'expert_recommendation' in request.POST:
-                step.expert_opinion = expert_opinion
-                step.plus_minus = plus_minus
-                step.expert_recommendation = expert_recommendation
-                step.save()
-                message = 'UPDATED!'  # сообщение для шаблона
-                active_tab = 'Expert'
+            possible_categories = request.POST.get('possible_categories', '').strip()
+            possible_tags = request.POST.get('possible_tags', '').strip()
+            description = request.POST.get('description', '').strip()
+
+            step.expert_opinion = expert_opinion
+            step.plus_minus = plus_minus
+            step.expert_recommendation = expert_recommendation
+
+            step.possible_categories = possible_categories
+            step.possible_tags = possible_tags
+            step.description = description
+
+            step.save()
+            message = 'UPDATED!'
+            active_tab = 'Expert'
+
 
         elif 'name' in request.POST and 'content' in request.POST:
             # --- Форма комментариев ---

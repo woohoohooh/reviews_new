@@ -46,6 +46,8 @@ class StepAdmin(admin.ModelAdmin):
                 'description',
                 'expert_opinion',
                 'expert_recommendation',
+                'possible_categories',
+                'possible_tags',
                 'plus_minus',
                 'keywords',
                 'seo_description',
