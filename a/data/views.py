@@ -67,16 +67,17 @@ def extract_between(text, start, end):
 
 
 
-
 def test2(request):
 
-    steps_list = Step101.objects.all().order_by('-published_date')
-    paginator = Paginator(steps_list, 30)  # По 30 шагов на страницу
+    steps_list = Step101.objects.all().order_by('published_date')
+
+    paginator = Paginator(steps_list, 30)
 
     page_number = request.GET.get('page')
     steps = paginator.get_page(page_number)
 
     return render(request, 'data/test2.html', {'steps': steps})
+
 
 
 
