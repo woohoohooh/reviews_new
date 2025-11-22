@@ -127,6 +127,7 @@ def generate_reviews_context(step=None, num_reviews=10):
     reviews_context = []
     brand = get_brands_list(step)
     for i in range(num_reviews):
+        brand = get_brands_list(step)
         min_len, max_len = ranges[i % len(ranges)]
         company_name_variants = [
             ("не указывать", 75),
