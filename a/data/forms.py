@@ -21,3 +21,12 @@ class Step101Form(forms.ModelForm):
             'keywords': forms.TextInput(attrs={'class': 'form-control'}),
             'seo_description': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+
+from django import forms
+
+class BulkStepForm(forms.Form):
+    raw_text = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 15}),
+        label="Данные для импорта (каждая строка — новый объект)"
+    )

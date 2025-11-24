@@ -1,0 +1,11 @@
+<h2>Импорт Step101</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Импортировать</button>
+</form>
+
+{% if message %}
+    <p><b>{{ message }}</b></p>
+{% endif %}

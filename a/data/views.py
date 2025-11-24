@@ -695,3 +695,57 @@ def add_comment(request, step_slug):
             user=request.user if request.user.is_authenticated else None
         )
         return HttpResponseRedirect(reverse('step_detail', args=[step.slug]))
+
+
+from django.shortcuts import render, redirect
+from .forms import BulkStepForm
+from .models import Step101
+from django.utils.text import slugify
+
+def bulk_create_steps(request):
+    message = None
+
+    if request.method == "POST":
+        form = BulkStepForm(request.POST)
+        if form.is_valid():
+            raw = form.cleaned_data['raw_text']
+            lines = raw.split("\n")
+            created = 0
+
+            for line in lines:
+                if "|||" not in line:
+                    continue
+
+                parts = [p.strip() for p in line.split("|||") if p.strip()]
+
+                if len(parts) < 5:
+                    continue  # Not enough fields
+
+                h1 = parts[0]
+                subtitle = parts[1]
+                brands = parts[2]
+                keyword = parts[3]
+                slug = parts[4]
+
+                Step101.objects.create(
+                    h1=h1,
+                    subtitle=subtitle,
+                    brands=brands,
+                    keyword=keyword,
+                    slug=slug,
+                    title=h1,                 # можно адаптировать
+                    description="",           # или автогенерация
+                    expert_opinion="",
+                    image_file_name="",
+                    image_alt_and_prompt="",
+                    seo_description=""
+                )
+                created += 1
+
+            message = f"Создано объектов: {created}"
+            return render(request, "data/bulk_steps.html", {"form": form, "message": message})
+
+    else:
+        form = BulkStepForm()
+
+    return render(request, "data/bulk_steps.html", {"form": form})

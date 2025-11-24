@@ -3620,6 +3620,8 @@ class Step101(models.Model):
         on_delete=models.CASCADE,
         db_index=True,
         verbose_name="Подтема",
+        blank=True,
+        null=True,
         default=None
     )
     author_type = models.ForeignKey(
