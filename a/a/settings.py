@@ -11,7 +11,7 @@ ALLOWED_HOSTS = ['xn----ctbbr8aya8db.xn--p1ai', 'localhost', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = ['https://xn----ctbbr8aya8db.xn--p1ai']
 
-DEBUG = True
+DEBUG = False
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
