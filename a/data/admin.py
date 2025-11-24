@@ -43,6 +43,7 @@ class StepAdmin(admin.ModelAdmin):
                 'brands',
                 'keyword',
                 'slug',
+                'title',
                 'description',
                 'expert_opinion',
                 'expert_recommendation',

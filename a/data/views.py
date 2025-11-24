@@ -306,14 +306,16 @@ def step_detail2(request, slug):
             return HttpResponseForbidden('Вы не можете отправлять комментарии.')
 
         # Определяем, какая форма была отправлена
-        if 'expert_opinion' in request.POST:
+        if 'seo_description' in request.POST:
+
             expert_opinion = request.POST.get('expert_opinion', '').strip()
             plus_minus = request.POST.get('plus_minus', '').strip()
             expert_recommendation = request.POST.get('expert_recommendation') == 'on'
 
             possible_categories = request.POST.get('possible_categories', '').strip()
             possible_tags = request.POST.get('possible_tags', '').strip()
-            description = request.POST.get('description', '').strip()
+            title = request.POST.get('title', '').strip()
+            seo_description = request.POST.get('seo_description', '').strip()
 
             step.expert_opinion = expert_opinion
             step.plus_minus = plus_minus
@@ -321,7 +323,9 @@ def step_detail2(request, slug):
 
             step.possible_categories = possible_categories
             step.possible_tags = possible_tags
-            step.description = description
+            step.seo_description = seo_description
+
+            step.title = title
 
             # получаем имя/строку автора из формы
             author_expert_name = request.POST.get('author_expert', '').strip()
@@ -390,29 +394,17 @@ def add_step101(request):
         form = Step101Form(request.POST)
         if form.is_valid():
             step = form.save(commit=False)
-
-            # подтема "Отзывы"
             step.subtopic = Subtopic101.objects.filter(title__icontains="Отзывы").first()
-
-            # автор по умолчанию "Клиент"
             step.author_type = Author101.objects.filter(type__icontains="Клиент").first()
-
-            # slug = keyword (через дефисы и lowercase)
             if step.keyword:
                 step.slug = slugify(step.keyword, allow_unicode=True)
-
-            # дискрипшн -> seo_description
-            step.seo_description = form.cleaned_data.get('description', '')
-
-            # сразу опубликовано
+            step.seo_description = form.cleaned_data.get('seo_description', '')
             step.is_published = True
             step.published_date = now()
-
             step.save()
             return redirect(step.get_absolute_url())
     else:
         form = Step101Form()
-
     return render(request, 'data/add_step101.html', {'form': form})
 
 

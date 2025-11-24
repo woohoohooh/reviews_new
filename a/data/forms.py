@@ -3,7 +3,7 @@ from .models import Step101
 
 class Step101Form(forms.ModelForm):
     description = forms.CharField(
-        label='Дискрипшн',
+        label='Мета Дискрипшн',
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         required=False
     )
