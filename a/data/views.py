@@ -620,42 +620,59 @@ def subtopic_list(request, slug):
 from django.db.models import Avg
 
 
-def step_detail(request, slug):
-    step_model_name = f"Step{SUFFIX}"
-    comment_model_name = f"Comment{SUFFIX}"
-    Step = apps.get_model('data', step_model_name)
-    Comment = apps.get_model('data', comment_model_name)
+from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Avg
+from django.apps import apps
+from urllib.parse import unquote
+import random
 
-    # Получение текущего шага
+def step_detail(request, slug):
+    Step = apps.get_model('data', f"Step{SUFFIX}")
+    Comment = apps.get_model('data', f"Comment{SUFFIX}")
+
     step = get_object_or_404(Step, slug=unquote(slug))
 
-    # Получение связанных объектов
-    subtopic = step.subtopic
-    topic = subtopic.topic
-    steps_field = f"steps{SUFFIX}"
-    steps = getattr(subtopic, steps_field).all()
-    comments_field = f"comments{SUFFIX}"
+    # ==========================
+    # ПЛЮСЫ / МИНУСЫ
+    # ==========================
+    plus_minus_raw = step.plus_minus or ""
+    raw_items = [i.strip() for i in plus_minus_raw.split(',') if i.strip()]
 
-    # Добавляем выборку is_positive и вычисляем средний рейтинг
-    comments = getattr(step, comments_field).filter(is_published=True).order_by('-published_date')
+    parsed_items = []
+    for item in raw_items:
+        sign = "plus" if item.startswith("+") else "minus"
+        text = item[1:].strip()
+        parsed_items.append({
+            "type": sign,
+            "text": text,
+            "likes": random.randint(0, 170),  # случайное число для лайков
+        })
 
-    # Вычисляем средний рейтинг во view
-    avg_rating = comments.aggregate(avg_rating=Avg('rating'))['avg_rating']
-    if avg_rating:
-        avg_rating = round(avg_rating, 1)
-    else:
-        avg_rating = "0.0"
+    parsed_items = sorted(parsed_items, key=lambda x: -x["likes"])
 
+    # ==========================
+    # ОБРАБОТКА POST
+    # ==========================
     if request.method == 'POST':
+        # Проверка honeypot
         honey_pot_value = request.POST.get('honey_pot', '').strip()
         if honey_pot_value:
             return redirect('step_detail', slug=slug)
 
+        # Добавление нового плюса/минуса
+        new_pm = request.POST.get('plus_minus', '').strip()
+        if new_pm and new_pm[0] in ('+', '-'):
+            items_list = [i.strip() for i in step.plus_minus.split(',') if i.strip()]
+            items_list.insert(0, new_pm)  # новый элемент в начало
+            step.plus_minus = ",".join(items_list)
+            step.save()
+            return redirect('step_detail', slug=slug)
+
+        # Добавление комментария
         text = request.POST.get('content', '').strip()
         username = (
             request.POST.get('user_name', '').strip()
-            if not request.user.is_authenticated
-            else request.user.username
+            if not request.user.is_authenticated else request.user.username
         )
         if text:
             Comment.objects.create(
@@ -665,19 +682,23 @@ def step_detail(request, slug):
             )
             return redirect('step_detail', slug=slug)
 
-    # Рендеринг страницы
-    return render(
-        request,
-        f'data/step_detail.html',
-        {
-            'topic': topic,
-            'subtopic': subtopic,
-            'step': step,
-            'steps': steps,
-            'comments': comments,
-            'avg_rating': avg_rating,  # Передаем вычисленный рейтинг в контекст
-        }
-    )
+    # ==========================
+    # КОММЕНТАРИИ И РЕЙТИНГ
+    # ==========================
+    comments_field = f"comments{SUFFIX}"
+    comments = getattr(step, comments_field).filter(is_published=True).order_by('-published_date')
+
+    avg_rating = comments.aggregate(avg_rating=Avg('rating'))['avg_rating']
+    avg_rating = round(avg_rating, 1) if avg_rating else "0.0"
+
+    return render(request, 'data/step_detail.html', {
+        'step': step,
+        'parsed_items': parsed_items[:15],  # первые 15 для отображения
+        'all_items': parsed_items,          # полный список для JS load more
+        'comments': comments,
+        'avg_rating': avg_rating,
+    })
+
 
 
 def add_comment(request, step_slug):

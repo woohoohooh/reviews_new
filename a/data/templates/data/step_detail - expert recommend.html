@@ -153,6 +153,14 @@
 
     <!-- Сайдбар -->
     <div class="expert-sidebar">
+        {% if step.expert_opinion %}
+            <h3>Мнение эксперта</h3>
+            <p>{{ step.expert_opinion }}</p>
+            {% if step.expert_recommendation %}
+                <div class="expert-recommendation"><span class="recommend-icon">✓</span>Эксперт рекомендует</div>
+            {% endif %}
+        {% endif %}
+
         <!-- Плюсы/Минусы -->
         <div class="pros-cons-section" id="pros-cons-container">
             {% for item in parsed_items %}
