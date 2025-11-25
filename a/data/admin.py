@@ -30,7 +30,7 @@ class CommentInline(admin.TabularInline):
 
 @admin.register(globals()[f'Step{SUFFIX_101}'])
 class StepAdmin(admin.ModelAdmin):
-    list_display = ('h1', 'subtitle', 'is_published')
+    list_display = ('h1', 'title', 'subtitle', 'is_published')
     list_per_page = 50
     actions = ['publish_selected']
     inlines = [CommentInline]

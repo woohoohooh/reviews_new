@@ -69,27 +69,28 @@ def extract_between(text, start, end):
 from django.db.models import F
 from datetime import datetime
 
+from django.core.paginator import Paginator
+from django.db.models import F
+
 def test2(request):
-
-    # 1. исправляем NULL-даты, чтобы пагинация не ломалась
-    Step101.objects.filter(published_date__isnull=True).update(
-        published_date=datetime(1, 1, 1)
-    )
-
-    # 2. сортировка
+    # --- 1. сортировка ---
     steps_list = Step101.objects.order_by(
         '-is_published',
-        'published_date'
+        F('published_date').asc(nulls_last=True)
     )
 
-    # 3. пагинация
-    paginator = Paginator(steps_list, 30333333)
-    steps = paginator.get_page(request.GET.get('page'))
+    # --- 2. пагинация: 30 на страницу ---
+    paginator = Paginator(steps_list, 30)
+    page_number = request.GET.get('page')
+    steps = paginator.get_page(page_number)
 
     return render(request, 'data/test2.html', {
         'steps': steps,
-        'count': steps.paginator.count,
+        'count': paginator.count,
+        'paginator': paginator,
     })
+
+
 
 
 
