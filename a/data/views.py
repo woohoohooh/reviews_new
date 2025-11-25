@@ -738,13 +738,7 @@ def bulk_create_steps(request):
                     subtitle=subtitle,
                     brands=brands,
                     keyword=keyword,
-                    slug=slug,
-                    title=h1,                 # можно адаптировать
-                    description="",           # или автогенерация
-                    expert_opinion="",
-                    image_file_name="",
-                    image_alt_and_prompt="",
-                    seo_description=""
+                    slug=slug
                 )
                 created += 1
 

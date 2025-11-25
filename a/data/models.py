@@ -3729,11 +3729,10 @@ class Comment101(models.Model):
         verbose_name="Позитивный комментарий"
     )
 
-    rating = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)],
-        default=5,
+    rating = models.PositiveIntegerField(
+        default=0,
         db_index=True,
-        verbose_name="Оценка (1–5)"
+        verbose_name="Лайки"
     )
 
     created_date = models.DateTimeField(
@@ -3893,11 +3892,10 @@ class ZComment001(models.Model):
         default=False
     )
 
-    rating = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)],
-        default=5,
+    rating = models.PositiveIntegerField(
+        default=0,
         db_index=True,
-        verbose_name="Оценка (1–5)"
+        verbose_name="Лайки"
     )
 
     created_at = models.DateTimeField(
