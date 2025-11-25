@@ -323,7 +323,16 @@ def step_detail2(request, slug):
         if 'seo_description' in request.POST:
 
             expert_opinion = request.POST.get('expert_opinion', '').strip()
+
+            # ----------------------------------------------------
+            # РАНДОМНАЯ ПЕРЕТАСОВКА СПИСКА ПЛЮСОВ / МИНУСОВ
             plus_minus = request.POST.get('plus_minus', '').strip()
+            if plus_minus:
+                items = [i.strip() for i in plus_minus.split(',') if i.strip()]
+                random.shuffle(items)
+                plus_minus = ",".join(items)
+            # ----------------------------------------------------
+
             expert_recommendation = request.POST.get('expert_recommendation') == 'on'
 
             possible_categories = request.POST.get('possible_categories', '').strip()
@@ -345,12 +354,12 @@ def step_detail2(request, slug):
             author_expert_name = request.POST.get('author_expert', '').strip()
 
             if author_expert_name:
-                # сначала пытаемся найти по title (чувствительность игнорируем) или по type
+                # сначала пытаемся найти по title или по type
                 author = Author101.objects.filter(title__iexact=author_expert_name).first()
                 if not author:
                     author = Author101.objects.filter(type__iexact=author_expert_name).first()
 
-                # если не нашли — создаём минимальную запись (type + title + h1)
+                # если не нашли — создаём минимальную запись
                 if not author:
                     author = Author101.objects.create(
                         type=author_expert_name,
@@ -364,9 +373,6 @@ def step_detail2(request, slug):
             step.save()
             message = 'UPDATED!'
             active_tab = 'Expert'
-
-
-
 
         elif 'name' in request.POST and 'content' in request.POST:
             # --- Форма комментариев ---
@@ -383,7 +389,7 @@ def step_detail2(request, slug):
                     created_date=now(),
                     is_published=False
                 )
-                message = 'ADDED!'  # сообщение для шаблона
+                message = 'ADDED!'
                 active_tab = 'AddReview'
 
                 comments = step.comments101.filter(is_published=True).order_by('-created_date')
@@ -396,7 +402,7 @@ def step_detail2(request, slug):
         'selected_num': num,
         'show_unpublished_notice': show_unpublished_notice,
         'message': message,
-        'active_tab': active_tab,  # передаем активную вкладку в шаблон
+        'active_tab': active_tab,
     })
 
 
