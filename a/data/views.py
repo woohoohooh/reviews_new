@@ -632,7 +632,6 @@ from django.db.models import Avg
 from django.apps import apps
 from urllib.parse import unquote
 import random
-
 def step_detail(request, slug):
     Step = apps.get_model('data', f"Step{SUFFIX}")
     Comment = apps.get_model('data', f"Comment{SUFFIX}")
@@ -640,28 +639,38 @@ def step_detail(request, slug):
     step = get_object_or_404(Step, slug=unquote(slug))
 
     # ==========================
-    # ПЛЮСЫ / МИНУСЫ
+    # ПЛЮСЫ / МИНУСЫ (исправлено)
     # ==========================
     plus_minus_raw = step.plus_minus or ""
     raw_items = [i.strip() for i in plus_minus_raw.split(',') if i.strip()]
 
     parsed_items = []
     for item in raw_items:
-        sign = "plus" if item.startswith("+") else "minus"
-        text = item[1:].strip()
+        if not item:
+            continue
+
+        if item.startswith("+"):
+            sign = "plus"
+            text = item[1:].strip()
+        elif item.startswith("-"):
+            sign = "minus"
+            text = item[1:].strip()
+        else:
+            continue
+
         parsed_items.append({
             "type": sign,
             "text": text,
-            "likes": random.randint(0, 170),  # случайное число для лайков
         })
 
-    parsed_items = sorted(parsed_items, key=lambda x: -x["likes"])
+    # берём первые 15, порядок как в БД
+    parsed_items_limited = parsed_items[:15]
 
     # ==========================
     # ОБРАБОТКА POST
     # ==========================
     if request.method == 'POST':
-        # Проверка honeypot
+        # Honeypot
         honey_pot_value = request.POST.get('honey_pot', '').strip()
         if honey_pot_value:
             return redirect('step_detail', slug=slug)
@@ -670,7 +679,7 @@ def step_detail(request, slug):
         new_pm = request.POST.get('plus_minus', '').strip()
         if new_pm and new_pm[0] in ('+', '-'):
             items_list = [i.strip() for i in step.plus_minus.split(',') if i.strip()]
-            items_list.insert(0, new_pm)  # новый элемент в начало
+            items_list.insert(0, new_pm)
             step.plus_minus = ",".join(items_list)
             step.save()
             return redirect('step_detail', slug=slug)
@@ -700,11 +709,12 @@ def step_detail(request, slug):
 
     return render(request, 'data/step_detail.html', {
         'step': step,
-        'parsed_items': parsed_items[:15],  # первые 15 для отображения
-        'all_items': parsed_items,          # полный список для JS load more
+        'parsed_items': parsed_items_limited,  # первые 15
+        'all_items': parsed_items,             # полный для JS load more
         'comments': comments,
         'avg_rating': avg_rating,
     })
+
 
 
 
