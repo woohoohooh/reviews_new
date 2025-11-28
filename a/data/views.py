@@ -71,13 +71,9 @@ from datetime import datetime
 
 from django.core.paginator import Paginator
 from django.db.models import F
-
 def test2(request):
-    # --- 1. сортировка ---
-    steps_list = Step101.objects.order_by(
-        '-is_published',
-        F('published_date').asc(nulls_last=True)
-    )
+    # --- 1. сортировка: новые сверху по updated_date ---
+    steps_list = Step101.objects.order_by('-updated_date')
 
     # --- 2. пагинация: 30 на страницу ---
     paginator = Paginator(steps_list, 30)
@@ -89,6 +85,8 @@ def test2(request):
         'count': paginator.count,
         'paginator': paginator,
     })
+
+
 
 
 
