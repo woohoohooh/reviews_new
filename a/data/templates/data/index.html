@@ -7,8 +7,8 @@
 {% block keywords %}отзывы, честные отзывы, отзывы о товарах, отзывы о компаниях, отзывы о услугах, рейтинг компаний, реальные мнения{% endblock %}
 
 {% block content %}
-
     <section class="container my-5">
+{% if steps.number == 1 %}
         <h1>Читайте и оставляйте честные отзывы о товарах, услугах и компаниях</h1>
 
         <p>
@@ -24,6 +24,7 @@
         </ul>
 
         <h2>🔹 Свежие отзывы от пользователей:</h2>
+{% endif %}
         <ul class="list-group">
             {% for step in steps %}
                 <li class="list-group-item">
@@ -39,12 +40,10 @@
         <!-- Пагинация -->
         <nav>
             <ul class="pagination justify-content-center mt-4">
-                {% if steps.has_previous %}
+
+                {% if prev_url %}
                     <li class="page-item">
-                        <a class="page-link" href="?page=1">Первая</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ steps.previous_page_number }}">Назад</a>
+                        <a class="page-link" href="{{ prev_url }}">Назад</a>
                     </li>
                 {% endif %}
 
@@ -52,16 +51,15 @@
                     <span class="page-link">Страница {{ steps.number }} из {{ steps.paginator.num_pages }}</span>
                 </li>
 
-                {% if steps.has_next %}
+                {% if next_url %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ steps.next_page_number }}">Вперёд</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ steps.paginator.num_pages }}">Последняя</a>
+                        <a class="page-link" href="{{ next_url }}">Вперёд</a>
                     </li>
                 {% endif %}
+
             </ul>
         </nav>
+{% if steps.number == 1 %}
 
         <h2>🔹 Часто задаваемые вопросы (FAQ)</h2>
         <div class="faq-block">
@@ -105,6 +103,6 @@
 
         <p>💡 <strong>Ваши отзывы — ключ к лучшим выборам для всех. Присоединяйтесь и влияйте на рынок!</strong></p>
 
+{% endif %}
     </section>
-
 {% endblock %}

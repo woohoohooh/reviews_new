@@ -87,14 +87,6 @@ def test2(request):
     })
 
 
-
-
-
-
-
-
-
-
 import random
 
 def maybe(prob, func):
@@ -603,14 +595,32 @@ def create_step_for_reviews_only(request):
     return render(request, 'data/for_reviews_only.html', context)
 
 
-def index(request):
+def index(request, page=1):
+
+    # Редирект с /1/ на /
+    if page == 1 and 'page' in request.path:
+        return redirect(reverse('index'))
+
     steps_list = Step101.objects.filter(is_published=True).order_by('-published_date')
-    paginator = Paginator(steps_list, 30)  # По 30 шагов на страницу
+    paginator = Paginator(steps_list, 30)
+    steps = paginator.get_page(page)
 
-    page_number = request.GET.get('page')
-    steps = paginator.get_page(page_number)
+    base_url = reverse('index')
+    prev_url = f"{base_url}{steps.previous_page_number()}/" if steps.has_previous() else None
+    next_url = f"{base_url}{steps.next_page_number()}/" if steps.has_next() else None
 
-    return render(request, 'data/index.html', {'steps': steps})
+    # Если предыдущая ведёт на первую — убираем /1/
+    if steps.has_previous() and steps.previous_page_number() == 1:
+        prev_url = base_url
+
+    return render(request, 'data/index.html', {
+        'steps': steps,
+        'prev_url': prev_url,
+        'next_url': next_url,
+        'canonical_url': request.build_absolute_uri(base_url) if page == 1 else None
+    })
+
+
 
 
 def subtopic_list(request, slug):

@@ -1,19 +1,48 @@
 {% extends 'data/base.html' %}
 
 {% block title %}{{ subtopic.title }}{% endblock %}
-
 {% block description %}{{ subtopic.seo_description }}{% endblock %}
-
 {% block keywords %}{{ subtopic.keywords }}{% endblock %}
 
 {% block content %}
-<h1>{{ subtopic.title }}</h1>
 
-<ul class="list-group">
-    {% for step in steps %}
+{# ===== Заголовок и описание — только на первой странице ===== #}
+{% if page_obj.number == 1 %}
+    <h1>{{ subtopic.title }}</h1>
+
+    {% if subtopic.seo_description %}
+        <div class="intro-block">
+            {{ subtopic.seo_description }}
+        </div>
+    {% endif %}
+{% endif %}
+
+{# ===== Список шагов (всегда) ===== #}
+<ul class="list-group mt-4">
+    {% for step in page_obj.object_list %}
         <li class="list-group-item">
             <a href="{% url 'step_detail' step.slug %}">{{ step.title }}</a>
         </li>
     {% endfor %}
 </ul>
+
+{# ===== Пагинация ===== #}
+<div class="pagination mt-4 d-flex justify-content-between">
+
+    {% if prev_url %}
+        <a class="btn btn-primary" href="{{ prev_url }}">Назад</a>
+    {% else %}
+        <span></span>
+    {% endif %}
+
+    <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+
+    {% if next_url %}
+        <a class="btn btn-primary" href="{{ next_url }}">Вперед</a>
+    {% else %}
+        <span></span>
+    {% endif %}
+
+</div>
+
 {% endblock %}
