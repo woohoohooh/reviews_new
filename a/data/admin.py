@@ -35,33 +35,6 @@ class StepAdmin(admin.ModelAdmin):
     actions = ['publish_selected']
     inlines = [CommentInline]
 
-    fieldsets = (
-        (None, {
-            'fields': (
-                'h1',
-                'subtitle',
-                'brands',
-                'keyword',
-                'slug',
-                'title',
-                'description',
-                'expert_opinion',
-                'expert_recommendation',
-                'possible_categories',
-                'possible_tags',
-                'plus_minus',
-                'keywords',
-                'seo_description',
-                'image_file_name',
-                'image_alt_and_prompt',
-                'image',
-                'tags',
-                'subtopic',
-                'author_type',
-                'is_published',
-            )
-        }),
-    )
 
     def get_changeform_initial_data(self, request):
         """Устанавливаем значение 'Отзывы' по умолчанию в поле 'Подтема' при добавлении"""
