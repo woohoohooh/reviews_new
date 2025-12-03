@@ -3675,11 +3675,19 @@ class Step101(models.Model):
             raise ValidationError({'expert_opinion': "Поле 'expert_opinion' слишком длинное. Максимум 11000 символов."})
 
     def save(self, *args, **kwargs):
+        # Полная валидация
         self.full_clean()
 
-        if self.is_published and not self.published_date:
-            self.published_date = now()
+        # 1. Авто-установка даты публикации
+        if self.is_published:
+            # Если даты нет или она равна минимальной "0001-01-01"
+            if not self.published_date or str(self.published_date).startswith("0001-01-01"):
+                self.published_date = now()
+        else:
+            # Если запись снята с публикации → дата сбрасывается
+            self.published_date = None
 
+        # 2. Генерация slug
         if not self.slug:
             base = self.keyword or self.h1 or self.title
             if base:
@@ -3688,14 +3696,17 @@ class Step101(models.Model):
                 clean_base = re.sub(r'[^\w\-а-яА-ЯёЁ]', '', clean_base)
                 self.slug = slugify(clean_base, allow_unicode=True)
 
+        # 3. Имя файла картинки
         if self.image and not self.image_file_name:
             self.image_file_name = os.path.splitext(os.path.basename(self.image.name))[0]
 
+        # 4. Подтягивание подкатегории "Отзывы"
         if not self.subtopic_id:
             default_subtopic = Subtopic101.objects.filter(title__iexact="Отзывы").first()
             if default_subtopic:
                 self.subtopic = default_subtopic
 
+        # 5. Сохранение
         super().save(*args, **kwargs)
 
 
