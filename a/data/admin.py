@@ -21,8 +21,8 @@ globals().update(models)
 class CommentInline(admin.TabularInline):
     model = globals()[f'Comment{SUFFIX_101}']
     extra = 0
-    fields = ('username', 'text', 'is_published', 'created_date')
-    readonly_fields = ('username', 'text', 'created_date')
+    fields = ('username', 'text', 'is_published', 'created_date', 'published_date')
+    readonly_fields = ('username', 'text', 'created_date', 'published_date')
     ordering = ('-created_date',)
     show_change_link = True
 
@@ -56,7 +56,13 @@ class StepAdmin(admin.ModelAdmin):
 
 @admin.register(globals()[f'Comment{SUFFIX_101}'])
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('username', 'step', 'is_published', 'created_date')
+    list_display = (
+        'username',
+        'step',
+        'is_published',
+        'created_date',
+        'published_date',
+    )
     list_filter = ('is_published', 'created_date')
     ordering = ('-created_date',)
     actions = ['approve_comments']

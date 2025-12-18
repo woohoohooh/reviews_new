@@ -344,178 +344,672 @@ class Comment001(models.Model):
 # 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002
 
 
-class Author002(models.Model):
-    type = models.CharField(max_length=100)
-    title = models.CharField(max_length=150, verbose_name="Заголовок title")
-    keywords = models.CharField(max_length=250, blank=True, null=True, verbose_name="Ключевые фразы")
-    seo_description = models.CharField(max_length=350, blank=True, null=True, verbose_name="Дискрипшн")
-    description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
-    h1 = models.CharField(max_length=150, verbose_name="Заголовок h1")
-    image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
-    image_file_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Название картинки для файла")
-    is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликовано")
+# 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002 002
+
+
+
+#
+# class Author002(models.Model):
+#     type = models.CharField(max_length=100)
+#     title = models.CharField(max_length=150, verbose_name="Заголовок title")
+#     keywords = models.CharField(max_length=250, blank=True, null=True, verbose_name="Ключевые фразы")
+#     seo_description = models.CharField(max_length=350, blank=True, null=True, verbose_name="Дискрипшн")
+#     description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
+#     h1 = models.CharField(max_length=150, verbose_name="Заголовок h1")
+#     image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
+#     image_file_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Название картинки для файла")
+#     is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликовано")
+#     slug = models.SlugField(unique=True, max_length=150, allow_unicode=True, blank=True)
+#
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#
+#     def save(self, *args, **kwargs):
+#         if not self.slug:
+#             self.slug = slugify(self.title, allow_unicode=True)
+#         if self.image and not self.image_file_name:
+#             self.image_file_name = os.path.splitext(os.path.basename(self.image.name))[0]
+#         super().save(*args, **kwargs)
+#
+#     def get_absolute_url(self):
+#         return reverse('author_detail', args=[self.slug])
+#
+#     class Meta:
+#         verbose_name = AUTHOR_VERBOSE_NAME_002
+#         verbose_name_plural = AUTHOR_VERBOSE_NAME_002
+#         indexes = [
+#             models.Index(fields=['is_published']),
+#             models.Index(fields=['slug']),
+#         ]
+#
+#     def __str__(self):
+#         return self.type
+#
+#
+# class Topic002(models.Model):
+#     slug = models.SlugField(unique=True, allow_unicode=True, max_length=150, blank=True)
+#     title = models.CharField(max_length=150)
+#     keywords = models.CharField(max_length=250, blank=True, null=True)
+#     seo_description = models.CharField(max_length=350, blank=True, null=True)
+#     description = models.TextField(blank=True, max_length=11000)
+#     h1 = models.CharField(max_length=150, blank=True, null=True)
+#     image = models.ImageField(upload_to=get_upload_to, blank=True, null=True)
+#     image_file_name = models.CharField(max_length=150, blank=True, null=True)
+#     image_alt_and_prompt = models.CharField(max_length=150, blank=True, null=True)
+#
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#
+#     def save(self, *args, **kwargs):
+#         if not self.slug:
+#             self.slug = custom_slugify(self.title)
+#         if self.image and not self.image_file_name:
+#             self.image_file_name = os.path.splitext(os.path.basename(self.image.name))[0]
+#         super().save(*args, **kwargs)
+#
+#     def image_url(self):
+#         if self.image:
+#             return self.image.url
+#         return ''
+#
+#     def get_absolute_url(self):
+#         return reverse('subtopic_list', args=[self.slug])
+#
+#     class Meta:
+#         verbose_name = TOPIC_VERBOSE_NAME_002
+#         verbose_name_plural = TOPIC_VERBOSE_NAME_002
+#         indexes = [
+#             models.Index(fields=['slug']),
+#         ]
+#
+#     def __str__(self):
+#         return self.title
+#
+#
+# class Subtopic002(models.Model):
+#     slug = models.SlugField(unique=True, allow_unicode=True, max_length=150, blank=True)
+#     title = models.CharField(max_length=150)
+#     keywords = models.CharField(max_length=250, blank=True, null=True)
+#     seo_description = models.CharField(max_length=350, blank=True, null=True)
+#     description = models.TextField(blank=True, max_length=11000)
+#     h1 = models.CharField(max_length=150, blank=True, null=True)
+#     image = models.ImageField(upload_to=get_upload_to, blank=True, null=True)
+#     image_file_name = models.CharField(max_length=150, blank=True, null=True)
+#     image_alt_and_prompt = models.CharField(max_length=150, blank=True, null=True)
+#
+#     topic = models.ForeignKey(
+#         Topic002, related_name='subtopics002',
+#         on_delete=models.CASCADE, null=True, blank=True
+#     )
+#
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#
+#     def save(self, *args, **kwargs):
+#         if not self.slug:
+#             self.slug = custom_slugify(self.title)
+#         if self.image and not self.image_file_name:
+#             self.image_file_name = os.path.splitext(os.path.basename(self.image.name))[0]
+#         super().save(*args, **kwargs)
+#
+#     def get_absolute_url(self):
+#         return reverse('subtopic_list', args=[self.slug])
+#
+#     class Meta:
+#         verbose_name = SUBTOPIC_VERBOSE_NAME_002
+#         verbose_name_plural = SUBTOPIC_VERBOSE_NAME_002
+#         indexes = [
+#             models.Index(fields=['slug']),
+#         ]
+#
+#     def __str__(self):
+#         return self.title
+#
+#
+# class Tag002(models.Model):
+#     name = models.CharField(max_length=100, unique=True, verbose_name="Название тега")
+#     slug = models.SlugField(unique=True, max_length=100, verbose_name="Слаг", blank=True)
+#
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#
+#     class Meta:
+#         db_table = "tag002"
+#         verbose_name = TAGS_VERBOSE_NAME_002
+#         verbose_name_plural = TAGS_VERBOSE_NAME_002
+#         ordering = ['name']
+#         indexes = [
+#             models.Index(fields=['slug']),
+#             models.Index(fields=['name']),
+#         ]
+#
+#     def save(self, *args, **kwargs):
+#         if not self.slug:
+#             self.slug = slugify(self.name.lower(), allow_unicode=True)
+#             base_slug = self.slug
+#             counter = 1
+#             while Tag002.objects.filter(slug=self.slug).exists():
+#                 self.slug = f"{base_slug}-{counter}"
+#                 counter += 1
+#         super().save(*args, **kwargs)
+#
+#     def __str__(self):
+#         return self.name
+#
+#
+# class Type002(models.Model):
+#     name = models.CharField(max_length=100, unique=True, verbose_name="Название типа")
+#     slug = models.SlugField(unique=True, max_length=100, verbose_name="Слаг", blank=True)
+#
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#
+#     class Meta:
+#         verbose_name = TAGS_VERBOSE_NAME_002
+#         verbose_name_plural = TAGS_VERBOSE_NAME_002
+#         ordering = ['name']
+#         indexes = [
+#             models.Index(fields=['slug']),
+#             models.Index(fields=['name']),
+#         ]
+#
+#     def save(self, *args, **kwargs):
+#         if not self.slug:
+#             self.slug = slugify(self.name.lower(), allow_unicode=True)
+#             base_slug = self.slug
+#             counter = 1
+#             while Type002.objects.filter(slug=self.slug).exists():
+#                 self.slug = f"{base_slug}-{counter}"
+#                 counter += 1
+#         super().save(*args, **kwargs)
+#
+#     def __str__(self):
+#         return self.name
+#
+# LANG_CHOICES = [
+#     ('en', 'English'),
+#     ('ru', 'Russian'),
+#     ('es', 'Spanish'),
+#     ('zh', 'Chinese'),
+# ]
+# class Step002(models.Model):
+#     language = models.CharField(max_length=5, choices=LANG_CHOICES, default='en', db_index=True)
+#     description = models.TextField(blank=True, max_length=11000)
+#     title = models.CharField(max_length=150)
+#     h1 = models.CharField(max_length=150)
+#     keyword = models.CharField(max_length=150, blank=True, null=True, unique=True)
+#     keywords = models.CharField(max_length=250, blank=True, null=True)
+#     image = models.ImageField(upload_to=get_upload_to, blank=True, null=True)
+#     image_file_name = models.CharField(max_length=150, blank=True, null=True)
+#     image_alt_and_prompt = models.CharField(max_length=150, blank=True, null=True)
+#     subtopic = models.ForeignKey(Subtopic002, related_name='steps002', on_delete=models.CASCADE, db_index=True)
+#     tags = models.ManyToManyField(Tag002, related_name="steps002", blank=True)
+#     author_type = models.ForeignKey(Author002, related_name='steps002', on_delete=models.CASCADE)
+#     seo_description = models.CharField(max_length=350, blank=True, null=True)
+#     slug = models.SlugField(unique=True, db_index=True, allow_unicode=True, max_length=150, blank=True)
+#     is_published = models.BooleanField(default=False, db_index=True)
+#     published_date = models.DateTimeField(null=True, blank=True, db_index=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     views = models.PositiveIntegerField(default=0, db_index=True)
+#
+#     def increment_views(self):
+#         self.views += 1
+#         self.save(update_fields=['views'])
+#
+#     class Meta:
+#         unique_together = ('slug', 'language')
+#         indexes = [
+#             models.Index(fields=['is_published', 'published_date']),
+#         ]
+#         verbose_name = STEP_VERBOSE_NAME_002
+#         verbose_name_plural = STEP_VERBOSE_NAME_002
+#
+#     def __str__(self):
+#         return self.title
+#
+#     def get_absolute_url(self):
+#         return reverse('step_detail', args=[self.slug])
+#
+#     @property
+#     def formatted_updated_date(self):
+#         return self.updated_at.strftime('%d.%m.%Y')
+#
+#     def clean(self):
+#         if self.slug and len(self.slug) > 150:
+#             raise ValidationError({'slug': "Поле 'slug' слишком длинное. Максимум 150 символов."})
+#         if self.seo_description and len(self.seo_description) > 350:
+#             raise ValidationError({'seo_description': "Поле 'seo_description' слишком длинное. Максимум 350 символов."})
+#         if self.keyword and len(self.keyword) > 150:
+#             raise ValidationError({'keyword': "Поле 'keyword' слишком длинное. Максимум 150 символов."})
+#         if self.description and len(self.description) > 11000:
+#             raise ValidationError({'description': "Поле 'description' слишком длинное. Максимум 11000 символов."})
+#         if self.h1 and len(self.h1) > 150:
+#             raise ValidationError({'h1': "Поле 'h1' слишком длинное. Максимум 150 символов."})
+#         if self.image_file_name and len(self.image_file_name) > 150:
+#             raise ValidationError({'image_file_name': "Поле 'image_file_name' слишком длинное. Максимум 150 символов."})
+#
+#     def save(self, *args, **kwargs):
+#         self.full_clean()
+#         if self.is_published and not self.published_date:
+#             self.published_date = now()
+#         if not self.slug:
+#             clean_title = self.title.strip().replace('\r', '').replace('\n', '')
+#             self.slug = slugify(clean_title, allow_unicode=True)
+#         if self.image and not self.image_file_name:
+#             self.image_file_name = os.path.splitext(os.path.basename(self.image.name))[0]
+#         super().save(*args, **kwargs)
+#
+# class Comment002(models.Model):
+#     step = models.ForeignKey('Step002', on_delete=models.CASCADE, related_name='comments002', db_index=True, verbose_name="Шаг")
+#     username = models.CharField(max_length=100, default="Аноним", verbose_name="Имя пользователя")
+#     text = models.TextField(verbose_name="Текст комментария")
+#     is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликован")
+#     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+#     published_at = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name="Дата одобрения")
+#     updated_at = models.DateTimeField(auto_now=True)
+#     parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+#     is_spam = models.BooleanField(default=False, db_index=True)
+#
+#     def approve(self):
+#         self.is_published = True
+#         self.published_at = timezone.now()
+#         self.save(update_fields=['is_published', 'published_at'])
+#
+#     def save(self, *args, **kwargs):
+#         if self.is_published and not self.published_at:
+#             self.published_at = timezone.now()
+#         elif not self.is_published:
+#             self.published_at = None
+#         super().save(*args, **kwargs)
+#
+#     class Meta:
+#         indexes = [
+#             models.Index(fields=['step', 'is_published', 'published_at']),
+#         ]
+#         verbose_name = COMMENTS_VERBOSE_NAME_002
+#         verbose_name_plural = COMMENTS_VERBOSE_NAME_002
+#
+#     def __str__(self):
+#         return f"Комментарий от {self.username} ({self.created_at:%d.%m.%Y})"
+#
+#     @property
+#     def formatted_created_date(self):
+#         return self.created_at.strftime('%d.%m.%Y')
+
+
+    # author_expert = models.ForeignKey('Author002', blank=True, null=True, on_delete=models.SET_NULL, verbose_name="Автор экспертного мнения")
+    # topic = models.ManyToManyField('Topic002', blank=True, verbose_name="Категория")
+    # subtopic = models.ManyToManyField('Subtopic002', blank=True, verbose_name="Рынок")
+    # type = models.ManyToManyField('Type002', blank=True, verbose_name="Тип")
+
+from django.urls import reverse
+from django.utils.text import slugify
+
+
+from django.db import models
+from django.urls import reverse
+from django.utils.text import slugify
+
+from django.db import models
+from django.urls import reverse
+from django.utils.text import slugify
+
+
+# ================== СПРАВОЧНИКИ ==================
+
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, allow_unicode=True)
+    description = models.TextField(blank=True, default='')
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
     class Meta:
-        verbose_name = AUTHOR_VERBOSE_NAME_002
-        verbose_name_plural = AUTHOR_VERBOSE_NAME_002
-    def __str__(self):
-        return self.type
-    # def get_absolute_url(self):
-    #     return reverse('author_detail', args=[self.id])
+        ordering = ['order', 'name']
 
-
-class Topic002(models.Model):
-    slug = models.SlugField(unique=True, allow_unicode=True, max_length=150)
-    title = models.CharField(max_length=150, verbose_name="Заголовок title")
-    keywords = models.CharField(max_length=250, blank=True, null=True, verbose_name="Ключевые фразы")
-    seo_description = models.CharField(max_length=350, blank=True, null=True, verbose_name="Дискрипшн")
-    description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
-    h1 = models.CharField(max_length=150, blank=True, null=True, verbose_name="Заголовок h1")
-    image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
-    image_file_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Название картинки для файла")
-    image_alt_and_prompt = models.CharField(max_length=150, blank=True, null=True, verbose_name="Описание картинки")
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = custom_slugify(self.title)
-        super().save(*args, **kwargs)
-    class Meta:
-        verbose_name = TOPIC_VERBOSE_NAME_002
-        verbose_name_plural = TOPIC_VERBOSE_NAME_002
-    def __str__(self):
-        return self.title
-    def get_absolute_url(self):
-        return reverse('subtopic_list', args=[self.slug])
-
-
-class Subtopic002(models.Model):
-    slug = models.SlugField(unique=True, allow_unicode=True, max_length=150)
-    title = models.CharField(max_length=150, verbose_name="Заголовок title")
-    keywords = models.CharField(max_length=250, blank=True, null=True, verbose_name="Ключевые фразы")
-    seo_description = models.CharField(max_length=350, blank=True, null=True, verbose_name="Дискрипшн")
-    description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
-    h1 = models.CharField(max_length=150, blank=True, null=True, verbose_name="Заголовок h1")
-    image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
-    image_file_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Название картинки для файла")
-    image_alt_and_prompt = models.CharField(max_length=150, blank=True, null=True, verbose_name="Описание картинки")
-    topic = models.ForeignKey(Topic002, related_name='subtopics002', on_delete=models.CASCADE, null=True, blank=True)
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = custom_slugify(self.title)
-        if self.image and not self.image_file_name:
-            self.image_file_name = os.path.splitext(os.path.basename(self.image.name))[0]
-        super().save(*args, **kwargs)
-    class Meta:
-        verbose_name = SUBTOPIC_VERBOSE_NAME_002
-        verbose_name_plural = SUBTOPIC_VERBOSE_NAME_002
-    def __str__(self):
-        return self.title
-    def get_absolute_url(self):
-        return reverse('subtopic_list', args=[self.slug])
-
-
-class Tag002(models.Model):
-    name = models.CharField(max_length=100, unique=True, verbose_name="Название тега")
-    slug = models.SlugField(unique=True, max_length=100, verbose_name="Слаг")
-    class Meta:
-        db_table = "tag002"  # Явное указание таблицы
-        verbose_name = TAGS_VERBOSE_NAME_002
-        verbose_name_plural = TAGS_VERBOSE_NAME_002
-        ordering = ['name']
-    def save(self, *args, **kwargs):
-        if not self.slug:  # Генерация слага только если он не задан
-            self.slug = slugify(self.name.lower(), allow_unicode=True)
-            base_slug = self.slug
-            counter = 1
-            while Tag002.objects.filter(slug=self.slug).exists():
-                self.slug = f"{base_slug}-{counter}"
-                counter += 1
-        super().save(*args, **kwargs)
     def __str__(self):
         return self.name
 
 
-class Step002(models.Model):
-    description = models.TextField(blank=True, verbose_name="Описание", max_length=11000)
-    title = models.CharField(max_length=150, verbose_name="Заголовок title")
-    h1 = models.CharField(max_length=150, verbose_name="Заголовок h1")
-    keyword = models.CharField(max_length=150, blank=True, null=True, unique=True, verbose_name="Ключевая фраза")
-    keywords = models.CharField(max_length=250, blank=True, null=True, verbose_name="Ключевые фразы")
-    image = models.ImageField(upload_to=get_upload_to, blank=True, null=True, verbose_name="Картинка")
-    image_file_name = models.CharField(max_length=150, blank=True, null=True, verbose_name="Название картинки для файла")
-    image_alt_and_prompt = models.CharField(max_length=150, blank=True, null=True, verbose_name="Описание картинки")
-    subtopic = models.ForeignKey(Subtopic002, related_name='steps002', on_delete=models.CASCADE, db_index=True, verbose_name="Подтема")
-    tags = models.ManyToManyField(Tag002, related_name="steps002", blank=True, verbose_name="теги")
-    author_type = models.ForeignKey(Author002, related_name='steps002', on_delete=models.CASCADE, verbose_name="Автор")
-    seo_description = models.CharField(max_length=350, blank=True, null=True, verbose_name="Дискрипшн")
-    slug = models.SlugField(unique=True, db_index=True, allow_unicode=True, max_length=150, verbose_name="Слуг")
-    is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликовано")
-    published_date = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name="Дата публикации")
-    updated_date = models.DateTimeField(auto_now=True, db_index=True, verbose_name="Дата обновления")
+class Market(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, allow_unicode=True)
+    description = models.TextField(blank=True, default='')
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
     class Meta:
-        indexes = [
-            models.Index(fields=['is_published', 'published_date']),
-        ]
-        verbose_name = STEP_VERBOSE_NAME_002
-        verbose_name_plural = STEP_VERBOSE_NAME_002
+        ordering = ['order', 'name']
+
     def __str__(self):
-        return self.title
+        return self.name
+
+
+class InvestmentType(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, allow_unicode=True)
+    description = models.TextField(blank=True, default='')
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return self.name
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True, default='')
+    popularity = models.PositiveIntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        self.name = self.name.lower()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+
+class AIAnalyzeYear(models.Model):
+    year = models.PositiveIntegerField(unique=True)
+    title = models.CharField(max_length=255, blank=True)
+    summary = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.year)
+
+
+# ================== ЭКСПЕРТ ==================
+
+class Expert(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, allow_unicode=True)
+
+    position = models.CharField(max_length=255, blank=True)
+    company = models.CharField(max_length=255, blank=True)
+
+    bio = models.TextField(blank=True, default='')
+
+    link_site = models.URLField(blank=True, null=True)
+    link_linkedin = models.URLField(blank=True, null=True)
+    link_x = models.URLField(blank=True, null=True)
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.name:
+            self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+
+# ================== ОСНОВНАЯ МОДЕЛЬ ==================
+
+class Project002(models.Model):
+    LANG_CHOICES = [
+        ('en', 'English'),
+        ('ru', 'Russian'),
+        ('es', 'Espanol'),
+        ('zh', 'China'),
+        ('ar', 'Arr'),
+    ]
+
+    language = models.CharField(
+        'Язык',
+        max_length=5,
+        choices=LANG_CHOICES,
+        default='en',
+        db_index=True
+    )
+
+    status = models.CharField(max_length=1000, null=True, blank=True)
+    project_name = models.CharField(max_length=500, null=True, blank=True)
+    project_subname = models.CharField(max_length=500, null=True, blank=True)
+
+    slug = models.SlugField(
+        allow_unicode=True,
+        max_length=500,
+        blank=True,
+        null=True
+    )
+
+    link_site = models.URLField(null=True, blank=True)
+    published = models.BooleanField(default=False)
+
+    description_short = models.TextField(blank=True, default='')
+    description_full = models.TextField(blank=True, default='')
+    description_seo = models.TextField(blank=True, default='')
+
+    title = models.CharField(max_length=1000, null=True, blank=True)
+    alt_brands = models.CharField(max_length=500, null=True, blank=True)
+    keywords = models.CharField(max_length=500, null=True, blank=True)
+
+    plus_minus = models.CharField(max_length=10000, null=True, blank=True)
+    criteries = models.CharField(max_length=1000, null=True, blank=True)
+
+    description_team_short = models.TextField(blank=True, default='')
+    description_team_full = models.TextField(blank=True, default='')
+
+    ai_summarize = models.TextField(blank=True, default='')
+    current_activity = models.TextField(blank=True, default='')
+
+    ticker = models.CharField(max_length=500, null=True, blank=True)
+
+    # ---------- ЭКСПЕРТНОЕ МНЕНИЕ ----------
+    expert_opinion = models.TextField(blank=True, default='')
+    expert_recommend = models.BooleanField(default=False)
+
+    expert_author = models.ForeignKey(
+        Expert,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='projects'
+    )
+
+    started_at = models.DateField(null=True, blank=True)
+    started_at_tooltip = models.TextField(blank=True, default='')
+
+    domain_registered = models.TextField(blank=True, default='')
+    domain_registered_tooltip = models.TextField(blank=True, default='')
+
+    location = models.CharField(max_length=1000, null=True, blank=True)
+
+    RISK_CHOICES = [
+        ("super_low", "Super Low"),
+        ("low", "Low"),
+        ("average", "Average"),
+        ("high", "High"),
+        ("super_high", "Super High"),
+    ]
+
+    pays_or_not = models.CharField(max_length=1000, null=True, blank=True)
+    risk = models.CharField(max_length=50, choices=RISK_CHOICES, null=True, blank=True)
+    risk_tooltip = models.TextField(blank=True, default='')
+
+    RATING_CHOICES = [(str(i), str(i)) for i in range(6)] + [("5_plus", "5+")]
+    our_rating = models.CharField(max_length=10, choices=RATING_CHOICES, null=True, blank=True)
+    our_rating_tooltip = models.TextField(blank=True, default='')
+
+    our_advice = models.TextField(blank=True, default='')
+    our_advice_tooltip = models.TextField(blank=True, default='')
+    our_opinion = models.TextField(blank=True, default='')
+
+    type_of_payments = models.TextField(blank=True, default='')
+    currencies_payment = models.CharField(max_length=500, null=True, blank=True)
+
+    results_digits = models.CharField(max_length=500, null=True, blank=True)
+    results_percent = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    results_period = models.DateField(null=True, blank=True)
+
+    min_investment = models.IntegerField(null=True, blank=True)
+    max_investment = models.IntegerField(null=True, blank=True)
+
+    investors = models.IntegerField(null=True, blank=True)
+    investors_tooltip = models.TextField(blank=True, default='')
+
+    competitors = models.CharField(max_length=1000, null=True, blank=True)
+    investing_type = models.CharField(max_length=500, null=True, blank=True)
+    dividends_type = models.CharField(max_length=500, null=True, blank=True)
+
+    # ---------- ССЫЛКИ ----------
+    link_github = models.URLField(null=True, blank=True)
+    link_register = models.URLField(null=True, blank=True)
+    link_plans = models.URLField(null=True, blank=True)
+    link_conditions = models.URLField(null=True, blank=True)
+    link_terms_fees = models.URLField(null=True, blank=True)
+
+    link_tg_channel = models.URLField(null=True, blank=True)
+    link_tg_group = models.URLField(null=True, blank=True)
+    link_youtube = models.URLField(null=True, blank=True)
+    link_facebook = models.URLField(null=True, blank=True)
+    link_x = models.URLField(null=True, blank=True)
+    link_another = models.URLField(null=True, blank=True)
+
+    link_whitepaper = models.URLField(null=True, blank=True)
+    link_news = models.URLField(null=True, blank=True)
+
+    phones = models.CharField(max_length=500, null=True, blank=True)
+
+    link_independent_stats = models.URLField(null=True, blank=True)
+    link_independent_stats_tooltip = models.URLField(max_length=500, null=True, blank=True)
+    link_independent_reviews = models.URLField(null=True, blank=True)
+    link_independent_reviews_tooltip = models.URLField(max_length=500, null=True, blank=True)
+
+    # ---------- ИЗОБРАЖЕНИЯ ----------
+    img_main_page = models.ImageField(upload_to='projects/logos/', blank=True)
+    img_logo = models.ImageField(upload_to='projects/logos/', blank=True)
+    img_cover = models.ImageField(upload_to='projects/cover/', blank=True)
+    img_cover_description = models.TextField(blank=True, default='')
+    img_cover_filename = models.CharField(max_length=500, null=True, blank=True)
+
+    # ---------- ФЛАГИ ----------
+    our_project = models.BooleanField(default=False)
+    top = models.BooleanField(default=False)
+    pro = models.BooleanField(default=False)
+
+    last_payment_date = models.DateField(null=True, blank=True)
+
+    average_income_percent = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    average_income_digits = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    max_income_percent = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    max_income_digits = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    all_time_percent = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    all_time_digits = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    our_deposit_all_time = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    pool_percent = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    pool_digits = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    max_drawdown = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    search_phases = models.CharField(max_length=500, null=True, blank=True)
+
+    published_at = models.DateField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # ---------- СВЯЗИ ----------
+    categories = models.ManyToManyField(Category, blank=True, related_name='projects')
+    markets = models.ManyToManyField(Market, blank=True, related_name='projects')
+    investment_types = models.ManyToManyField(InvestmentType, blank=True, related_name='projects')
+    tags = models.ManyToManyField(Tag, blank=True, related_name='projects')
+    ai_analyze_yearly = models.ManyToManyField(AIAnalyzeYear, blank=True, related_name='projects')
+
+    related_posts = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        blank=True,
+        related_name='related_to'
+    )
+
+    class Meta:
+        ordering = ['-published_at', '-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['language', 'slug'],
+                name='unique_project_slug_per_language'
+            )
+        ]
+
     def get_absolute_url(self):
-        return reverse('step_detail', args=[self.slug])
-    @property
-    def formatted_updated_date(self):
-        return self.updated_date.strftime('%d.%m.%Y')
-    def clean(self):
-        if len(self.slug) > 150:
-            raise ValidationError({'slug': "Поле 'slug' слишком длинное. Максимум 150 символов."})
-        if len(self.seo_description) > 350:
-            raise ValidationError({'seo_description': "Поле 'seo_description' слишком длинное. Максимум 350 символов."})
-        if len(self.keyword) > 150:
-            raise ValidationError({'keyword': "Поле 'keyword' слишком длинное. Максимум 150 символов."})
-        if self.keyword:
-            if len(self.keyword) > 150:
-                raise ValidationError({'keyword': "Поле 'keyword' слишком длинное. Максимум 150 символов."})
-        if len(self.description) > 11000:
-            raise ValidationError({'description': "Поле 'description' слишком длинное. Максимум 11000 символов."})
-        if len(self.h1) > 150:
-            raise ValidationError({'h1': "Поле 'h1' слишком длинное. Максимум 150 символов."})
-        if len(self.image_file_name) > 150:
-            raise ValidationError({'image_file_name': "Поле 'image_file_name' слишком длинное. Максимум 150 символов."})
+        return reverse('project_detail', kwargs={'slug': self.slug, 'lang': self.language})
+
     def save(self, *args, **kwargs):
-        self.full_clean()
-        if self.is_published and not self.published_date:
-            self.published_date = now()
-        if not self.slug:
-            clean_title = self.title.strip().replace('\r', '').replace('\n', '')
-            self.slug = slugify(clean_title, allow_unicode=True)
-        if self.image and not self.image_file_name:
-            self.image_file_name = os.path.splitext(os.path.basename(self.image.name))[0]
+        if not self.slug and self.project_name:
+            self.slug = slugify(self.project_name, allow_unicode=True)
         super().save(*args, **kwargs)
 
-
-class Comment002(models.Model):
-    step = models.ForeignKey('Step002', on_delete=models.CASCADE, related_name='comments002', db_index=True, verbose_name="Шаг")
-    username = models.CharField(max_length=100, default="Аноним", verbose_name="Имя пользователя")
-    text = models.TextField(verbose_name="Текст комментария")
-    is_published = models.BooleanField(default=False, db_index=True, verbose_name="Опубликован")
-    created_date = models.DateTimeField(default=now, verbose_name="Дата создания")
-    published_date = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name="Дата одобрения")
-    def save(self, *args, **kwargs):
-        if self.is_published and not self.published_date:
-            self.published_date = now()
-        elif not self.is_published:
-            self.published_date = None
-        super().save(*args, **kwargs)
-    class Meta:
-        indexes = [
-            models.Index(fields=['step', 'is_published', 'published_date']),
-        ]
-        verbose_name = COMMENTS_VERBOSE_NAME_002
-        verbose_name_plural = COMMENTS_VERBOSE_NAME_002
     def __str__(self):
-        return f"Комментарий от {self.username} ({self.created_date:%d.%m.%Y})"
-    @property
-    def formatted_created_date(self):
-        """Возвращает дату создания в формате 'дд.мм.гггг'."""
-        return self.created_date.strftime('%d.%m.%Y')
+        return f"{self.project_name or 'Без названия'} ({self.language})"
+
+
+# ================== КОММЕНТАРИИ ==================
+
+class ProjectComment(models.Model):
+    project = models.ForeignKey(Project002, on_delete=models.CASCADE, related_name='comments')
+
+    author_name = models.CharField(max_length=255)
+    author_email = models.EmailField(blank=True, null=True)
+
+    comment = models.TextField()
+    recommend = models.BooleanField(default=False)
+
+    parent = models.ForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='replies'
+    )
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"{self.author_name}: {self.comment[:40]}"
+
+
+#
+# class CommentInvestProject002(models.Model):
+#     project = models.ForeignKey('InvestProject002', on_delete=models.CASCADE, related_name='comments_invest', verbose_name="Проект")
+#     name = models.CharField(max_length=300, default='Anonymous')
+#     content = models.TextField()
+#     is_positive = models.BooleanField(default=True)
+#     published = models.BooleanField('Опубликовано', default=False)
+#     rating = models.PositiveIntegerField(default=0, db_index=True, verbose_name="Лайки")
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+#     is_spam = models.BooleanField(default=False, db_index=True)
+#
+#     def approve(self):
+#         self.published = True
+#         self.save(update_fields=['published'])
+#
+#     class Meta:
+#         indexes = [
+#             models.Index(fields=['project', 'published', 'created_at']),
+#             models.Index(fields=['rating']),
+#         ]
+#         verbose_name = "Комментарий проекта"
+#         verbose_name_plural = "Комментарии проектов"
+#
+#     def __str__(self):
+#         return f"{self.name} ({self.created_at:%d.%m.%Y})"
 
 
 # 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003 003
@@ -3786,6 +4280,13 @@ class Comment101(models.Model):
     @property
     def formatted_created_date(self):
         return self.created_date.strftime('%d.%m.%Y')
+
+    @property
+    def formatted_published_date(self):
+        if not self.published_date:
+            return None
+        return self.published_date.strftime('%d.%m.%Y')
+
 
 
 # ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001 ENGIL001

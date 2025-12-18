@@ -124,7 +124,10 @@
                         <li class="comment-item" style="border-left:5px solid {% if comment.is_positive %}#28a745{% else %}#dc3545{% endif %}; padding-left:15px;">
                             <div style="display:flex; justify-content:space-between; align-items:center;">
                                 <strong>{{ comment.username|default:"Аноним" }}</strong>
-                                {% if comment.created_date %}<span style="font-size:0.9em; color:#888;">{{ comment.formatted_created_date }}</span>{% endif %}
+                                <div style="font-size:0.85em; color:#888;">
+                                    <span>{{ comment.formatted_published_date }}</span>
+                                </div>
+
                             </div>
                             <p>{{ comment.text|linebreaks }}</p>
                             <div style="display:flex; justify-content:space-between; align-items:center;">

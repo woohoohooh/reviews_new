@@ -1,6 +1,5 @@
 from .models import custom_slugify
 from .models import Tag001, Author001, Topic001, Subtopic001, Step001, Comment001
-from .models import Tag002, Author002, Topic002, Subtopic002, Step002, Comment002
 from .models import Tag003, Author003, Topic003, Subtopic003, Step003, Comment003
 from .models import Tag004, Author004, Topic004, Subtopic004, Step004, Comment004
 from .models import Tag005, Author005, Topic005, Subtopic005, Step005, Comment005
@@ -640,6 +639,8 @@ from django.db.models import Avg
 from django.apps import apps
 from urllib.parse import unquote
 import random
+
+
 def step_detail(request, slug):
     Step = apps.get_model('data', f"Step{SUFFIX}")
     Comment = apps.get_model('data', f"Comment{SUFFIX}")
