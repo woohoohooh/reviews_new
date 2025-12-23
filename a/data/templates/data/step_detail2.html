@@ -90,11 +90,12 @@ body { font-family: 'Nunito', sans-serif; }
 <div class="form-container">
     <button onclick="location.href='/test2'">← Back</button>
 
-    {% if message %}
+    {% if message and message != "None" %}
     <div class="success-message" id="success-message">
         {{ message }}
     </div>
     {% endif %}
+
 
     <select id="num_reviews">
         <option value="random" {% if selected_num == 'random' %}selected{% endif %}>Random</option>
