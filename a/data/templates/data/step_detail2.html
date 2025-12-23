@@ -116,7 +116,7 @@ body { font-family: 'Nunito', sans-serif; }
             {% csrf_token %}
             <div class="form-group">
                 <label for="plus_minus">Plus-minus:</label>
-                <textarea id="plus_minus" name="plus_minus" class="company-textarea">{{ step.plus_minus }}</textarea>
+                <textarea id="plus_minus" name="plus_minus" class="company-textarea">{{ step.plus_minus|default_if_none:"" }}</textarea>
             </div><br>
             <div class="form-group">
                 <label for="author_expert">Author Expert:</label>
@@ -125,11 +125,11 @@ body { font-family: 'Nunito', sans-serif; }
                        name="author_expert"
                        class="company-textarea"
                        placeholder=""
-                       value="{% if step.author_type %}{{ step.author_type.title }}{% endif %}">
+                       value="{{ step.author_type.title|default_if_none:'' }}{{ step.author_type.title }}{% endif %}">
             </div>
             <div class="form-group">
                 <label for="expert_opinion">Expert Opinion:</label>
-                <textarea id="expert_opinion" name="expert_opinion" class="company-textarea">{{ step.expert_opinion }}</textarea>
+                <textarea id="expert_opinion" name="expert_opinion" class="company-textarea">{{ step.expert_opinion|default_if_none:"" }}</textarea>
             </div>
             <div class="expert-checkbox">
                 <input type="checkbox" id="expert_recommendation" name="expert_recommendation" {% if step.expert_recommendation %}checked{% endif %}>
@@ -138,22 +138,22 @@ body { font-family: 'Nunito', sans-serif; }
 
             <div class="form-group">
                 <label for="possible_categories">Possible Categories:</label>
-                <textarea id="possible_categories" name="possible_categories" class="company-textarea">{{ step.possible_categories }}</textarea>
+                <textarea id="possible_categories" name="possible_categories" class="company-textarea">{{ step.possible_categories|default_if_none:"" }}</textarea>
             </div><br>
 
             <div class="form-group">
                 <label for="possible_tags">Possible Tags:</label>
-                <textarea id="possible_tags" name="possible_tags" class="company-textarea">{{ step.possible_tags }}</textarea>
+                <textarea id="possible_tags" name="possible_tags" class="company-textarea">{{ step.possible_tags|default_if_none:"" }}</textarea>
             </div><br>
 
             <div class="form-group">
                 <label for="title">Title:</label>
-                <textarea id="title" name="title" class="company-textarea">{{ step.title }}</textarea>
+                <textarea id="title" name="title" class="company-textarea">{{ step.title|default_if_none:"" }}</textarea>
             </div><br>
 
             <div class="form-group">
                 <label for="seo_description">Meta Description:</label>
-                <textarea id="seo_description" name="seo_description" class="company-textarea">{{ step.seo_description }}</textarea>
+                <textarea id="seo_description" name="seo_description" class="company-textarea">{{ step.seo_description|default_if_none:"" }}</textarea>
             </div><br>
 
 
