@@ -125,7 +125,7 @@ body { font-family: 'Nunito', sans-serif; }
                        name="author_expert"
                        class="company-textarea"
                        placeholder=""
-                       value="{{ step.author_type.title|default_if_none:'' }}{{ step.author_type.title }}{% endif %}">
+                       value="{% if step.author_type %}{{ step.author_type.title }}{% endif %}">
             </div>
             <div class="form-group">
                 <label for="expert_opinion">Expert Opinion:</label>
