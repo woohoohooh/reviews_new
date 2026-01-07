@@ -1,8 +1,6 @@
 import os
 from pathlib import Path
 
-SUFFIX = '101' # 1
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-ga9ad_9sai+-zyflw*-%g1d-f5*bjw614po)up!v_s^6%q!8-*'
@@ -13,7 +11,6 @@ CSRF_TRUSTED_ORIGINS = ['https://xn----ctbbr8aya8db.xn--p1ai']
 
 DEBUG = False
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 INSTALLED_APPS = [
     'django.contrib.admin',
