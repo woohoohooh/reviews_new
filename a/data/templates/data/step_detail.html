@@ -117,6 +117,34 @@
             </div>
         </div>
 
+        {% if step.expert_opinion %}
+        <div style="border: 0.5px solid #e0e0e0; border-radius: 12px; background: #fff; padding: 18px 20px; display: flex; gap: 16px; align-items: flex-start; margin-bottom: 24px;">
+            <div style="width:52px; height:52px; border-radius:50%; flex-shrink:0; background:#EEEDFE; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:500; color:#3C3489;">
+                {% if step.author_type %}{{ step.author_type.type|slice:":2"|upper }}{% else %}ЭК{% endif %}
+            </div>
+            <div style="flex:1; min-width:0;">
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;">
+                    {% if step.author_type %}
+                        <a href="{% url 'author_detail' step.author_type.pk %}"
+                           style="font-size:15px; font-weight:600; color:#667eea; text-decoration:none;">
+                            {{ step.author_type.type }}, {{ step.author_type.h1 }}
+                        </a>
+                    {% endif %}
+                    <span style="font-size:11px; background:#EEEDFE; color:#3C3489; padding:2px 9px; border-radius:20px; font-weight:500;">Эксперт</span>
+                </div>
+                <p style="font-size:14px; line-height:1.65; color:#444; margin:0;">
+                    {{ step.expert_opinion }}
+                </p>
+                {% if step.expert_recommendation %}
+                <div style="display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:5px 12px; border-radius:8px; font-size:13px; font-weight:500; background:#EAF3DE; color:#27500A;">
+                    <span style="width:7px; height:7px; border-radius:50%; background:#639922; display:inline-block;"></span>
+                    Рекомендует
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
         <div class="comments-section">
             {% if comments %}
                 <ul id="comments-list">

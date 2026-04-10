@@ -1,0 +1,82 @@
+{% extends "data/base.html" %}
+{% block title %}{{ author.title }}{% endblock %}
+{% block description %}{{ author.seo_description }}{% endblock %}
+{% block keywords %}{{ author.keywords }}{% endblock %}
+
+{% block content %}
+<style>
+    .author-header {
+        border: 0.5px solid #e0e0e0;
+        border-radius: 12px;
+        background: #fff;
+        padding: 28px 28px;
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+        margin-bottom: 32px;
+    }
+    .author-avatar {
+        width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0;
+        background: #EEEDFE; display: flex; align-items: center;
+        justify-content: center; font-size: 26px; font-weight: 500; color: #3C3489;
+        overflow: hidden;
+    }
+    .author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .author-name { font-size: 1.6rem; font-weight: 700; margin: 0 0 4px; color: #222; }
+    .author-h1 { font-size: 1rem; color: #666; margin: 0 0 14px; }
+    .author-desc { font-size: 0.95rem; line-height: 1.7; color: #444; }
+    .expert-badge {
+        display: inline-block; font-size: 11px; background: #EEEDFE;
+        color: #3C3489; padding: 2px 10px; border-radius: 20px; font-weight: 500; margin-bottom: 10px;
+    }
+
+    .steps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .step-card {
+        border: 0.5px solid #e0e0e0; border-radius: 10px; background: #fff;
+        padding: 16px 18px; text-decoration: none; color: inherit;
+        display: block; transition: border-color 0.2s;
+    }
+    .step-card:hover { border-color: #667eea; }
+    .step-card-title { font-size: 0.95rem; font-weight: 600; color: #333; margin-bottom: 6px; }
+    .step-card-subtitle { font-size: 0.85rem; color: #888; }
+    .step-card-date { font-size: 0.8rem; color: #aaa; margin-top: 10px; }
+
+    .section-title { font-size: 1.2rem; font-weight: 600; color: #333; margin-bottom: 16px; }
+</style>
+
+<div class="author-header">
+    <div class="author-avatar">
+        {% if author.image %}
+            <img src="{{ author.image.url }}" alt="{{ author.h1 }}">
+        {% else %}
+            {{ author.type|slice:":2"|upper }}
+        {% endif %}
+    </div>
+    <div style="flex:1; min-width:0;">
+        <span class="expert-badge">Эксперт</span>
+        <h1 class="author-name">{{ author.type }}</h1>
+        <p class="author-h1">{{ author.h1 }}</p>
+        {% if author.description %}
+            <p class="author-desc">{{ author.description }}</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if steps %}
+    <p class="section-title">Материалы эксперта ({{ steps.count }})</p>
+    <div class="steps-grid">
+        {% for step in steps %}
+        <a href="{{ step.get_absolute_url }}" class="step-card">
+            <div class="step-card-title">{{ step.h1 }}</div>
+            {% if step.subtitle %}
+                <div class="step-card-subtitle">{{ step.subtitle }}</div>
+            {% endif %}
+            <div class="step-card-date">{{ step.formatted_updated_date }}</div>
+        </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <p style="color:#888;">Материалов пока нет.</p>
+{% endif %}
+
+{% endblock %}

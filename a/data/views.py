@@ -724,8 +724,25 @@ def step_detail(request, slug):
         'avg_rating': avg_rating,
     })
 
+def author_list(request):
+    Author = apps.get_model('data', f"Author{SUFFIX}")
+    authors = Author.objects.filter(is_published=True)
 
+    return render(request, 'data/author_list.html', {
+        'authors': authors,
+    })
 
+def author_detail(request, pk):
+    Author = apps.get_model('data', f"Author{SUFFIX}")
+    Step = apps.get_model('data', f"Step{SUFFIX}")
+
+    author = get_object_or_404(Author, pk=pk)
+    steps = Step.objects.filter(author_type=author, is_published=True).order_by('-published_date')
+
+    return render(request, 'data/author_detail.html', {
+        'author': author,
+        'steps': steps,
+    })
 
 def add_comment(request, step_slug):
     comment_model_name = f"Comment{SUFFIX}"
