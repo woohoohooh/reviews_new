@@ -4,8 +4,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-        <!-- Yandex.Metrika counter -->
-    <script type="text/javascript" >
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
        m[i].l=1*new Date();
        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
@@ -19,7 +19,7 @@
        });
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/102602528" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Отзывы в РФ: Обзор товаров и услуг{% endblock %}</title>
@@ -28,192 +28,228 @@
     <link rel="canonical" href="https://отзывы-в.рф{{ request.path }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
 
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            font-size: 18px;
-            margin: 0;
-            padding: 0;
-            background-color: #f7f7f7;
-            color: #333;
-        }
+<style>
 
-        .navbar {
-            background-color: #ffffff;
-            padding: 15px 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 18px;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+    color: #333;
+}
 
-        .navbar-brand a {
-            color: #007bff;
-            font-weight: 700;
-            font-size: 1.7rem;
-            text-decoration: none;
-        }
+/* NAVBAR */
 
-        .navbar-brand a:hover {
-            color: #0056b3;
-        }
+.navbar {
+    background-color: #ffffff;
+    padding: 15px 30px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display:flex;
+    align-items:center;
+}
 
-        .section {
-            padding: 50px 20px;
-        }
+.navbar-brand a {
+    color:#007bff;
+    font-weight:700;
+    font-size:1.7rem;
+    text-decoration:none;
+}
 
-        .footer {
-            background-color: #ffffff;
-            color: #333;
-            padding: 20px 0;
-            text-align: center;
-            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-        }
+.navbar-brand a:hover {
+    color:#0056b3;
+}
 
-        .footer-menu a {
-            color: #007bff;
-            text-decoration: none;
-        }
+.navbar-menu {
+    margin-left:auto;
+}
 
-        .footer-menu a:hover {
-            text-decoration: underline;
-        }
+.navbar-menu a {
+    color:#333;
+    text-decoration:none;
+    font-size:1.1rem;
+    margin-left:25px;
+    font-weight:500;
+}
 
-        .highlighted {
-            background-color: #ffffff;
-            border-left: 5px solid #007bff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            color: #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+.navbar-menu a:hover {
+    color:#007bff;
+}
 
-        .highlighted .date {
-            font-size: 0.9em;
-            color: #777;
-        }
+/* PAGE */
 
-        .card {
-            background-color: #ffffff;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            color: #333;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+.section {
+    padding:50px 20px;
+}
 
-        .card-title {
-            color: #007bff;
-            font-size: 1.4rem;
-        }
+.footer {
+    background-color:#ffffff;
+    color:#333;
+    padding:20px 0;
+    text-align:center;
+    box-shadow:0 -4px 6px rgba(0,0,0,0.1);
+}
 
-        .card-body {
-            font-size: 1.1rem;
-        }
+.footer-menu a {
+    color:#007bff;
+    text-decoration:none;
+}
 
-        .btn-primary {
-            background-color: #007bff;
-            border: none;
-            padding: 10px 20px;
-            color: white;
-            border-radius: 5px;
-            text-decoration: none;
-        }
+.footer-menu a:hover {
+    text-decoration:underline;
+}
 
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
+.highlighted {
+    background-color:#ffffff;
+    border-left:5px solid #007bff;
+    padding:15px;
+    border-radius:8px;
+    margin-bottom:20px;
+    color:#333;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
 
-        .seo-block {
-            background-color: #ffffff;
-            padding: 30px;
-            margin-top: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
+.highlighted .date {
+    font-size:0.9em;
+    color:#777;
+}
 
-        .seo-block h2 {
-            color: #007bff;
-            font-size: 2rem;
-        }
+.card {
+    background-color:#ffffff;
+    border-radius:8px;
+    padding:20px;
+    margin-bottom:15px;
+    color:#333;
+    box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
 
-        .seo-block p {
-            color: #555;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
+.card-title {
+    color:#007bff;
+    font-size:1.4rem;
+}
 
-        .faq-item {
-            background-color: #f9f9f9;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
+.card-body {
+    font-size:1.1rem;
+}
 
-        .faq-item h3 {
-            color: #007bff;
-            font-size: 1.5rem;
-        }
+.btn-primary {
+    background-color:#007bff;
+    border:none;
+    padding:10px 20px;
+    color:white;
+    border-radius:5px;
+    text-decoration:none;
+}
 
-        .faq-item p {
-            color: #666;
-        }
+.btn-primary:hover {
+    background-color:#0056b3;
+}
 
-        .cta-button {
-            background-color: #007bff;
-            padding: 15px 30px;
-            border-radius: 5px;
-            color: white;
-            text-align: center;
-            font-size: 1.2rem;
-            margin-top: 30px;
-            display: block;
-        }
+.seo-block {
+    background-color:#ffffff;
+    padding:30px;
+    margin-top:30px;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
 
-        .cta-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+.seo-block h2 {
+    color:#007bff;
+    font-size:2rem;
+}
 
-    {% block extra_head %}{% endblock %}
+.seo-block p {
+    color:#555;
+    font-size:1.2rem;
+    margin-bottom:20px;
+}
+
+.faq-item {
+    background-color:#f9f9f9;
+    border-radius:8px;
+    margin-bottom:15px;
+    padding:20px;
+    box-shadow:0 2px 5px rgba(0,0,0,0.05);
+}
+
+.faq-item h3 {
+    color:#007bff;
+    font-size:1.5rem;
+}
+
+.faq-item p {
+    color:#666;
+}
+
+.cta-button {
+    background-color:#007bff;
+    padding:15px 30px;
+    border-radius:5px;
+    color:white;
+    text-align:center;
+    font-size:1.2rem;
+    margin-top:30px;
+    display:block;
+}
+
+.cta-button:hover {
+    background-color:#0056b3;
+}
+
+</style>
+
+{% block extra_head %}{% endblock %}
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="navbar-brand">
-            <a href="/">Отзывы в РФ</a>
-        </div>
-        <div class="navbar-brand">
-            <a href="{% url 'author_list' %}">Эксперты</a>
-        </div>
-    </nav>
 
-    <section class="section">
-        <div class="container">
-            {% block content %}
-            {% endblock %}
-        </div>
-    </section>
+<nav class="navbar">
 
-    <footer class="footer">
-        {% if show_footer_menu %}
-        <div class="footer-menu">
-            <ul class="list-inline">
-                {% for item in footer_menu %}
-                <li class="list-inline-item"><a href="{{ item.link }}">{{ item.title }}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-        <p>&copy; Отзывы в РФ. Все права защищены.</p>
-        <a href="https://dzen.ru/otzyvyv" target="_blank" rel="noopener noreferrer">Дзен</a>
-        <a href="https://vk.com/otzyvyv" target="_blank" rel="noopener noreferrer">ВК</a>
-    </footer>
+    <div class="navbar-brand">
+        <a href="/">Отзывы в РФ</a>
+    </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <div class="navbar-menu">
+        <a href="{% url 'author_list' %}">Эксперты</a>
+    </div>
 
-    {% block extra_scripts %}{% endblock %}
+</nav>
+
+<section class="section">
+<div class="container">
+{% block content %}
+{% endblock %}
+</div>
+</section>
+
+<footer class="footer">
+
+{% if show_footer_menu %}
+<div class="footer-menu">
+<ul class="list-inline">
+{% for item in footer_menu %}
+<li class="list-inline-item">
+<a href="{{ item.link }}">{{ item.title }}</a>
+</li>
+{% endfor %}
+</ul>
+</div>
+{% endif %}
+
+<p>&copy; Отзывы в РФ. Все права защищены.</p>
+
+<a href="https://dzen.ru/otzyvyv" target="_blank" rel="noopener noreferrer">Дзен</a>
+<a href="https://vk.com/otzyvyv" target="_blank" rel="noopener noreferrer">ВК</a>
+
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+{% block extra_scripts %}{% endblock %}
+
 </body>
 </html>

@@ -452,10 +452,6 @@ def create_step_for_reviews_only(request):
                 author_model, tag_model, topic_model, subtopic_model, step_model, comment_model = (
                     Author101, Tag101, Topic101, Subtopic101, Step101, Comment101
                 )
-            elif site == "банк.рф":
-                author_model, tag_model, topic_model, subtopic_model, step_model, comment_model = (
-                    Author002, Tag002, Topic002, Subtopic002, Step002, Comment002
-                )
             elif site == "здоровье.рф":
                 author_model, tag_model, topic_model, subtopic_model, step_model, comment_model = (
                     Author003, Tag003, Topic003, Subtopic003, Step003, Comment003
@@ -657,7 +653,6 @@ def step_detail(request, slug):
     for item in raw_items:
         if not item:
             continue
-
         if item.startswith("+"):
             sign = "plus"
             text = item[1:].strip()
@@ -666,13 +661,14 @@ def step_detail(request, slug):
             text = item[1:].strip()
         else:
             continue
-
         parsed_items.append({
             "type": sign,
             "text": text,
+            "likes": 0,
         })
 
-    # берём первые 15, порядок как в БД
+    # минусы наверху, плюсы ниже
+    parsed_items.sort(key=lambda x: 0 if x["type"] == "minus" else 1)
     parsed_items_limited = parsed_items[:15]
 
     # ==========================
@@ -716,12 +712,20 @@ def step_detail(request, slug):
     avg_rating = comments.aggregate(avg_rating=Avg('rating'))['avg_rating']
     avg_rating = round(avg_rating, 1) if avg_rating else "0.0"
 
+    show_expert = bool(
+        step.expert_recommendation
+        and step.expert_opinion
+        and step.author_type
+        and step.author_type.is_published
+    )
+
     return render(request, 'data/step_detail.html', {
         'step': step,
         'parsed_items': parsed_items_limited,  # первые 15
         'all_items': parsed_items,             # полный для JS load more
         'comments': comments,
         'avg_rating': avg_rating,
+        'show_expert': show_expert,
     })
 
 def author_list(request):
