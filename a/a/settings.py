@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-ga9ad_9sai+-zyflw*-%g1d-f5*bjw614po)up!v_s^6%q!8-*'
 
-ALLOWED_HOSTS = ['xn----ctbbr8aya8db.xn--p1ai', 'localhost', '127.0.0.1', 'woohoohooh-reviews-new-18bd.twc1.net']
+ALLOWED_HOSTS = ['xn----ctbbr8aya8db.xn--p1ai', 'localhost', '127.0.0.1', 'woohoohooh-reviews-new-1aa3.twc1.net']
 
 CSRF_TRUSTED_ORIGINS = ['https://xn----ctbbr8aya8db.xn--p1ai']
 
